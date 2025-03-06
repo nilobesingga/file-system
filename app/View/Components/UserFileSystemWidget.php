@@ -12,7 +12,7 @@ class UserFileSystemWidget extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct($totalFiles = 0, $storageUsage = 0, $recentUploadsCount = 0)
+    public function __construct($totalFiles = 0, $storageUsage = "", $recentUploadsCount = 0)
     {
         $this->totalFiles = $totalFiles;
         $this->storageUsage = $storageUsage;

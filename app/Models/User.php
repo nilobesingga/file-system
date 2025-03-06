@@ -51,8 +51,14 @@ class User extends Authenticatable
     // Relationship with categories (many-to-many)
     public function categories()
     {
-        return $this->belongsToMany(CategoryUser::class, 'category_user');
+        return $this->belongsToMany(CategoryUser::class, 'category_user','user_id','category_id');
     }
+
+    public function category()
+    {
+        return $this->belongsToMany(Category::class, 'category_user');
+    }
+
 
     // Relationship with files
     public function files()
