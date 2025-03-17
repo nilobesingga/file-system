@@ -27,8 +27,18 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        $user = Auth::user();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Check if user is authenticated and has 2FA enabled but not verified
+        if ($user && $user->two_factor_secret && !$request->session()->has('two_factor_verified')) {
+            return redirect()->route('two-factor.challenge');
+        }
+
+        if (Auth::user()->is_admin) {
+            // User is an admin, redirect to admin dashboard
+            return redirect()->intended(route('admin.dashboard'));
+        }
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
@@ -39,7 +49,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

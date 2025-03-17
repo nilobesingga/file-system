@@ -1,50 +1,32 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TwoFactorController;
+use App\Http\Middleware\Admin;
+use App\Http\Middleware\EnsureTwoFactorVerified;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// Redirect authenticated users to dashboard
-Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        if (Auth::check()) {
-            if (Auth::check() && Auth::user()->is_admin) {
-                return redirect()->route('admin.dashboard');
-            }
-            return redirect()->route('dashboard');
+// Redirect authenticated users to dashboard or 2FA if enabled
+Route::get('/', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->two_factor_secret && ! session('two_factor_verified')) {
+            return redirect()->route('two-factor.challenge');
+        }
+        if ($user->is_admin) {
+            return redirect()->route('admin.dashboard');
         }
         return redirect()->route('dashboard');
-    });
-});
+    }
+    return view('auth/login');
+})->name('home');
 
-// Show login page for unauthenticated users only
-Route::middleware(['guest'])->group(function () {
-    Route::get('/', function () {
-        if (Auth::check()) {
-            if (Auth::user()->is_admin) {
-                return redirect()->route('admin.dashboard');
-            }
-            return redirect()->route('dashboard');
-        }
-        return view('auth/login');
-    })->name('login');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+// Admin routes
+Route::middleware(['auth', Admin::class])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::post('/upload', [AdminController::class, 'upload'])->name('admin.upload');
@@ -68,8 +50,23 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
     });
     Route::get('/files/download/{file}', [AdminController::class, 'downloadFile'])->name('file.download');
-    Route::post('/user/upload', [DashboardController::class, 'upload'])->name('user.upload');
+});
 
+Route::middleware('auth')->group(function () {
+    Route::get('/two-factor-challenge', [TwoFactorController::class, 'show'])->name('two-factor.challenge');
+    Route::post('/two-factor-challenge', [TwoFactorController::class, 'verify'])->name('two-factor.verify');
+    Route::post('/user/two-factor-authentication', [TwoFactorController::class, 'enable'])->name('2fa.enable');
+    Route::put('/user/two-factor-authentication', [TwoFactorController::class, 'confirm'])->name('2fa.confirm');
+    Route::put('/user/disable', [TwoFactorController::class, 'disable2FA'])->name('2fa.disable');
+    Route::post('/user/upload', [DashboardController::class, 'upload'])->name('user.upload');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// User routes
+Route::middleware(['auth',EnsureTwoFactorVerified::class])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__.'/auth.php';

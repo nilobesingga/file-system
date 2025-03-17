@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Files;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // $files = Files::with('user', 'category')->where('user_id', auth()->id())->latest()->get();
-        // return view('dashboard', compact('files'));
-
-        $user = auth()->user();
+        $user = Auth::user();
         $categories = $user->category; // Get user's categories
         $categoryIds = $categories->pluck('id')->toArray();
 

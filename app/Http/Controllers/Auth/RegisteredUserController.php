@@ -66,16 +66,15 @@ class RegisteredUserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'confirmed', 'min:8'],
             'category_ids' => ['required', 'array'],
             'category_ids.*' => ['exists:categories,id'],
-            // 'is_admin' => ['boolean'],
+            // 'is_admin' => ['nullable', 'boolean'],
         ]);
-        $isAdmin = ($request->has('is_admin') && $request->is_admin == true) ? 1 : 0; // Default to false if missing (unlikely due to validation)
+        $isAdmin = ($request->is_admin == 'true') ? 1 : 0;
         $user->update([
             'name' => $request->name,
             'email' => $request->email,

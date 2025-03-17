@@ -6,23 +6,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Support\Facades\RateLimiter;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'is_admin'
-    ];
+
+    protected $table = 'users';
+    protected $primaryKey = 'id';
+    protected $guarded = ['id'];
+    // protected $fillable = [
+    //     'name',
+    //     'email',
+    //     'password',
+    //     'is_admin',
+    // ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -34,19 +40,25 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_admin' => 'boolean'
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_admin' => 'boolean'
+    ];
+
+    // /**
+    //  * Get the attributes that should be cast.
+    //  *
+    //  * @return array<string, string>
+    //  */
+    // protected function casts(): array
+    // {
+    //     return [
+    //         'email_verified_at' => 'datetime',
+    //         'password' => 'hashed',
+    //         'is_admin' => 'boolean'
+    //     ];
+    // }
 
     // Relationship with categories (many-to-many)
     public function categories()
@@ -64,5 +76,10 @@ class User extends Authenticatable
     public function files()
     {
         return $this->hasMany(Files::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->is_admin; // ✅ Accessor for checking admin status
     }
 }

@@ -1,6 +1,6 @@
 <x-app-layout>
     {{-- <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
             Upload Files
         </h2>
     </x-slot> --}}
@@ -12,21 +12,25 @@
                         {{ session('success') }}
                     </div>
                 @endif
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 mb-2">
+            <div class="p-6 mb-2 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Upload Files</h3>
                 <form action="{{ route('admin.upload') }}" method="POST" enctype="multipart/form-data" id="dropzoneForm" class="space-y-4">
                     @csrf
-                    <div class="dropzone" id="dropzoneUpload">
-                        <div class="dz-message needsclick flex flex-col items-center justify-center text-center p-8">
-                            <svg class="w-12 h-12 text-gray-600 dark:text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <div class="p-4 transition border-2 border-gray-400 border-dashed rounded-lg dropzone dark:border-gray-600 hover:border-gray-600 dark:hover:border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" id="dropzoneUpload">
+                        <div class="flex flex-col items-center justify-center p-8 text-center dz-message needsclick">
+                            <!-- Upload Icon -->
+                            <svg class="w-12 h-12 mb-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                             </svg>
+
+                            <!-- Dropzone Text -->
                             <p class="text-gray-600 dark:text-gray-300">Drag and drop files here, or click to select files</p>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Any file type allowed (max 10MB each)</p>
                         </div>
                     </div>
                     <div class="mt-4">
                         <x-input-label for="category_ids" :value="__('Categories')" />
-                        <select name="category_id" id="category_id" data-choice class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" required>
+                        <select name="category_id" id="category_id" data-choice class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" required>
                             <option value="">Select Category</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -34,10 +38,10 @@
                         </select>
                         <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                     </div>
-                    <button type="submit" id="submitDropzone" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hidden">
+                    <button type="submit" id="submitDropzone" class="inline-flex items-center hidden px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Upload Files
                     </button>
-                    <div id="dropzoneErrors" class="mt-2 text-sm text-red-600 dark:text-red-400 hidden"></div>
+                    <div id="dropzoneErrors" class="hidden mt-2 text-sm text-red-600 dark:text-red-400"></div>
                 </form>
             </div>
             <x-files-list :files="$files"/>
@@ -111,6 +115,21 @@
             });
         });
     </script>
-    <!-- Dropzone CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css" integrity="sha512-jU/7UFiaW5UBGODEopEqnbIAHOI8fO6T99m7T1YKKGvtzK+huaDfbV7SnU0F9ha0x1cv0g8b6WCLP1B9pUFljA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .dropzone {
+            border: 2px dashed #9ca3af !important; /* Tailwind's gray-400 */
+                border-radius: 8px; /* Matches Tailwind's rounded-lg */
+                padding: 1.5rem; /* Matches Tailwind's p-6 */
+                background-color: transparent !important; /* Prevent Dropzone overrides */
+            }
+
+            .dropzone:hover {
+                border-color: #4b5563 !important; /* Tailwind's gray-600 */
+            }
+
+            .dropzone .dz-message {
+                color: #4b5563; /* Tailwind's text-gray-600 */
+            }
+
+    </style>
 </x-app-layout>

@@ -4,10 +4,10 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
-class RedirectIfAdmin
+class EnsureTwoFactorVerified
 {
     /**
      * Handle an incoming request.
@@ -16,9 +16,13 @@ class RedirectIfAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->is_admin) {
-            return redirect()->route('admin.dashboard');
+        $user = Auth::user();
+
+        // Check if user is authenticated and has 2FA enabled but not verified
+        if ($user && $user->two_factor_secret && !$request->session()->has('two_factor_verified')) {
+            return redirect()->route('two-factor.challenge');
         }
+
         return $next($request);
     }
 }
