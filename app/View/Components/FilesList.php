@@ -6,13 +6,15 @@ use Illuminate\View\Component;
 class FilesList extends Component
 {
     public $files;
+    public $category;
 
     /**
      * Create a new component instance.
      */
-    public function __construct($files = array())
+    public function __construct($files = array(), $category = array())
     {
         $this->files = $files;
+        $this->category = $category;
     }
 
     /**

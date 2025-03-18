@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Files;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -22,13 +23,11 @@ class DashboardController extends Controller
                      ->paginate(15);
 
         $totalFiles = $files->count();
-        $storageUsage =  0;//Files::whereIn('category_id', $categoryIds)->sum(function ($file) {
-        //     return Storage::disk('public')->size($file->path);
-        // });
-        $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
+        $storageUsage =  0;
+        $recentUploadsCount =   Files::whereIn('category_id', $categoryIds)
                                  ->where('created_at', '>=', now()->subDays(7))
                                  ->count();
-
-        return view('dashboard', compact('files', 'totalFiles', 'storageUsage', 'recentUploadsCount', 'categories'));
+        $category = Category::all();
+        return view('dashboard', compact('files', 'totalFiles', 'storageUsage', 'recentUploadsCount', 'categories','category'));
     }
 }

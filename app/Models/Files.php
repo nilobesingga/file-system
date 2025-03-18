@@ -8,12 +8,7 @@ class Files extends Model
 {
     protected $table = "files";
     protected $primaryKey = "id";
-    protected $fillable = [
-        'name',
-        'path',
-        'user_id',
-        'category_id',
-    ];
+    protected $guarded = ["id"];
 
     public function user()
     {

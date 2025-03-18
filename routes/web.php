@@ -49,7 +49,6 @@ Route::middleware(['auth', Admin::class])->group(function () {
         Route::get('/users', [AdminController::class, 'listUsers'])->name('admin.users');
         Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
     });
-    Route::get('/files/download/{file}', [AdminController::class, 'downloadFile'])->name('file.download');
 });
 
 Route::middleware('auth')->group(function () {
@@ -62,6 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/files/download/{file}', [AdminController::class, 'downloadFile'])->name('file.download');
 });
 
 // User routes

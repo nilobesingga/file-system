@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Files;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 class AdminController extends Controller
@@ -29,30 +30,48 @@ class AdminController extends Controller
 
     public function upload(Request $request)
     {
+        DB::beginTransaction();
         $request->validate([
             'file' => 'required|array',
             'file.*' => 'max:10000', // Validate each file
-            'category_id' => 'required|exists:categories,id'
+            'category_id' => 'required|exists:categories,id',
+            'document_name' => 'required|string|max:255'
         ]);
 
-        $categoryId = $request->category_id;
-        $category = Category::findOrFail($categoryId); // Fetch the category to get its name
-        $categoryName = strtolower(str_replace(' ', '-', $category->name)); // Sanitize category name for folder (e.g., "My Category" -> "my-category")
-        $files = $request->file('file');
+        try {
+            $categoryId = $request->category_id;
+            $document_name = $request->document_name;
+            $category = Category::findOrFail($categoryId); // Fetch the category to get its name
+            $categoryName = strtolower(str_replace(' ', '-', $category->name)); // Sanitize category name for folder (e.g., "My Category" -> "my-category")
+            $files = $request->file('file');
 
-        foreach ($files as $file) {
-            $folderPath = "{$categoryName}"; // Path: storage/app/public/files/[category_name]
-            $path = $file->store($folderPath, 'public'); // Store in storage/app/public/files/[category_name]/filename
+            foreach ($files as $file) {
+                $folderPath = "{$categoryName}"; // Path: storage/app/public/files/[category_name]
+                $path = $file->store($folderPath, 'public'); // Store in storage/app/public/files/[category_name]/filename
 
-            Files::create([
-                'name' => $file->getClientOriginalName(),
-                'path' => $path, // Path will be like "files/my-category/filename.png"
-                'user_id' => Auth::user()->id,
-                'category_id' => $categoryId,
-            ]);
+                Files::create([
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $path, // Path will be like "files/my-category/filename.png"
+                    'user_id' => Auth::user()->id,
+                    'category_id' => $categoryId,
+                    'document_name' => $document_name,
+                ]);
+            }
+            DB::commit();
+            return response()->json(['success' => true], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'errors' => $e->validator->errors()->getMessages(),
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred: ' . $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json(['success' => true], 200);
     }
 
     public function destroy($id)

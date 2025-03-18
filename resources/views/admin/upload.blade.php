@@ -8,14 +8,39 @@
     <div class="py-3">
         <div class="w-full mx-auto sm:px-6 lg:px-8">
             @if (session('success'))
-                    <div class="mb-4 text-sm text-green-600 dark:text-green-400">
-                        {{ session('success') }}
-                    </div>
-                @endif
+                <div class="mb-4 text-sm text-green-600 dark:text-green-400">
+                    {{ session('success') }}
+                </div>
+            @endif
             <div class="p-6 mb-2 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                 <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Upload Files</h3>
                 <form action="{{ route('admin.upload') }}" method="POST" enctype="multipart/form-data" id="dropzoneForm" class="space-y-4">
                     @csrf
+                    <!-- Document Name Input Field -->
+                    <div class="flex flex-row gap-2 mt-4">
+                        <div class="sm:w-1/2">
+                            <x-input-label for="document_name" :value="__('Document Name')" required />
+                            <x-text-input
+                                id="document_name"
+                                name="document_name"
+                                type="text"
+                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                                placeholder="Enter document name"
+                                required
+                            />
+                            <x-input-error :messages="$errors->get('document_name')" class="mt-2" id="document_name_error" />
+                        </div>
+                        <div class="sm:w-1/2">
+                            <x-input-label for="category_ids" :value="__('Categories')" />
+                            <select name="category_id" id="category_id" data-choice class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" required>
+                                <option value="">Select Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                        </div>
+                    </div>
                     <div class="p-4 transition border-2 border-gray-400 border-dashed rounded-lg dropzone dark:border-gray-600 hover:border-gray-600 dark:hover:border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" id="dropzoneUpload">
                         <div class="flex flex-col items-center justify-center p-8 text-center dz-message needsclick">
                             <!-- Upload Icon -->
@@ -28,23 +53,13 @@
                             <p class="text-sm text-gray-500 dark:text-gray-400">Any file type allowed (max 10MB each)</p>
                         </div>
                     </div>
-                    <div class="mt-4">
-                        <x-input-label for="category_ids" :value="__('Categories')" />
-                        <select name="category_id" id="category_id" data-choice class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" required>
-                            <option value="">Select Category</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
-                    </div>
                     <button type="submit" id="submitDropzone" class="inline-flex items-center hidden px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Upload Files
                     </button>
                     <div id="dropzoneErrors" class="hidden mt-2 text-sm text-red-600 dark:text-red-400"></div>
                 </form>
             </div>
-            <x-files-list :files="$files"/>
+            <x-files-list :files="$files" :category="$categories"/>
         </div>
     </div>
 <!-- PDF.js Library -->
@@ -70,6 +85,7 @@
                     });
                     this.on('error', function (file, errorMessage) {
                         if (file) {
+                            const documentNameError = document.getElementById('document_name_error');
                             document.getElementById('dropzoneErrors').textContent = errorMessage;
                             document.getElementById('dropzoneErrors').classList.remove('hidden');
                         }
@@ -88,15 +104,22 @@
             // Handle form submission manually
             document.getElementById('submitDropzone').addEventListener('click', function (e) {
                 e.preventDefault();
+
+                const documentName = document.getElementById('document_name').value;
+                if (!documentName) {
+                    document.getElementById('dropzoneErrors').textContent = 'Please enter document name';
+                    document.getElementById('dropzoneErrors').classList.remove('hidden');
+                    return
+                }
+
                 const categoryId = document.getElementById('category_id').value;
                 if (!categoryId) {
                     document.getElementById('dropzoneErrors').textContent = 'Please select a category';
                     document.getElementById('dropzoneErrors').classList.remove('hidden');
                     return;
                 }
-
                 // Add category_id to the form data
-                dropzone.options.params = { category_id: categoryId };
+                dropzone.options.params = { category_id: categoryId, document_name : documentName };
                 dropzone.processQueue();
             });
 
