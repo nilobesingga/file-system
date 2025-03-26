@@ -24,7 +24,6 @@ class AdminController extends Controller
         $totalFiles = $files->count();
         $storageUsage = \App\Helpers\FileHelper::getTotalSize();
         $recentUploadsCount = Files::where('user_id',Auth::user()->id)->where('created_at', '>=', now()->subDays(7))->count();
-
         return view('admin.dashboard', compact('files', 'categories', 'users', 'totalFiles', 'storageUsage', 'recentUploadsCount'));
     }
 
@@ -78,7 +77,7 @@ class AdminController extends Controller
     {
         $file = Files::findOrFail($id);
         Storage::delete($file->path);
-        $file->delete();
+        $file->update(['is_delete' => 1]);
 
         return redirect()->route('admin.upload')->with('success', 'File deleted successfully');
     }
@@ -111,7 +110,7 @@ class AdminController extends Controller
     public function destroyCategory($id)
     {
         $category = Category::findOrFail($id);
-        $category->delete();
+        $category->update(['is_delete' => 1]);
 
         return redirect()->back()->with('success', 'Category deleted successfully');
     }

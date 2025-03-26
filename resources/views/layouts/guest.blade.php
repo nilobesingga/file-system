@@ -13,17 +13,48 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Custom Styles -->
+        <style>
+            .card {
+                /* background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); */
+                border-radius: 15px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                position: relative;
+                overflow: hidden;
+                transition: border 0.3s ease-in-out;
+                color: #000;
+            }
+
+            .card:hover {
+                border: 2px solid #3b82f6;
+                animation: borderAnimation 1s linear infinite;
+            }
+
+            @keyframes borderAnimation {
+                0% {
+                    border-color: #1e3a8a;
+                }
+                50% {
+                    border-color: #3b82f6;
+                }
+                100% {
+                    border-color: #1e3a8a;
+                }
+            }
+        </style>
     </head>
-    <body class="font-sans antialiased text-gray-900">
-        <div class="flex flex-col items-center min-h-screen pt-6 bg-gray-100 sm:justify-center sm:pt-0 dark:bg-gray-900">
+    <body class="font-sans antialiased" style="background-image: url('{{ asset('images/bg.png') }}'); background-size: cover; background-position: center;">
+        <div class="flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 ">
             <div>
                 <a href="/">
                     {{-- <x-application-logo class="w-20 h-20 text-gray-500" /> --}}
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'CapLionPoint') }}" class="w-auto h-20">
+                    <img src="{{ asset('images/CLP-White.svg') }}" alt="{{ config('app.name', 'CapLionPoint') }}" class="w-auto h-20">
+
                 </a>
             </div>
 
-            <div class="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md dark:bg-gray-800 sm:rounded-lg">
+            <div class="w-full px-6 py-6 mt-6 overflow-hidden bg-white border border-gray-300 shadow-lg sm:max-w-md dark:bg-gray-800 sm:rounded-lg card">
                 {{ $slot }}
             </div>
         </div>

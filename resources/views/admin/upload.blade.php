@@ -41,7 +41,7 @@
                             <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                         </div>
                     </div>
-                    <div class="p-4 transition border-2 border-gray-400 border-dashed rounded-lg dropzone dark:border-gray-600 hover:border-gray-600 dark:hover:border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" id="dropzoneUpload">
+                    <div class="p-4 transition border-2 border-yellow-800 border-dashed rounded-lg dropzone dark:border-yellow-900 hover:border-yellow-600 dark:hover:border-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-700" id="dropzoneUpload">
                         <div class="flex flex-col items-center justify-center p-8 text-center dz-message needsclick">
                             <!-- Upload Icon -->
                             <svg class="w-12 h-12 mb-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -53,7 +53,11 @@
                             <p class="text-sm text-gray-500 dark:text-gray-400">Any file type allowed (max 10MB each)</p>
                         </div>
                     </div>
-                    <button type="submit" id="submitDropzone" class="inline-flex items-center hidden px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <button type="submit" id="submitDropzone" class="inline-flex items-center hidden px-4 py-2 text-white rounded-md bg-customBlue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+
                         Upload Files
                     </button>
                     <div id="dropzoneErrors" class="hidden mt-2 text-sm text-red-600 dark:text-red-400"></div>

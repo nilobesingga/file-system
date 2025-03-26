@@ -36,36 +36,148 @@
         <table id="filesTable" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">Document Name</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">Category</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">Upload Date</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">Actions</th>
+                    <th scope="col" class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'unread', 'direction' => request('sort') === 'unread' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Read/Unread status">
+                            Read | Unread
+                            <span class="ml-2 sort-icon" data-column="0">
+                                @if(request('sort') === 'unread')
+                                    @if(request('direction') === 'asc')
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="inline-block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                                    </svg>
+                                @endif
+                            </span>
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'document_name', 'direction' => request('sort') === 'document_name' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Document Name">
+                            Document Name
+                            <span class="ml-2 sort-icon" data-column="1">
+                                @if(request('sort') === 'document_name')
+                                    @if(request('direction') === 'asc')
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="inline-block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                                    </svg>
+                                @endif
+                            </span>
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'category', 'direction' => request('sort') === 'category' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Category">
+                            Category
+                            <span class="ml-2 sort-icon" data-column="2">
+                                @if(request('sort') === 'category')
+                                    @if(request('direction') === 'asc')
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="inline-block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                                    </svg>
+                                @endif
+                            </span>
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => request('sort') === 'created_at' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Upload Date">
+                            Upload Date
+                            <span class="ml-2 sort-icon" data-column="3">
+                                @if(request('sort') === 'created_at')
+                                    @if(request('direction') === 'asc')
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="inline-block w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="inline-block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                                    </svg>
+                                @endif
+                            </span>
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                        Actions
+                    </th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                @foreach($files as $file)
-                <tr>
+                @forelse($files as $file)
+                <tr class="{{ $file->isReadByCurrentUser() ? '' : 'bg-yellow-50 dark:bg-yellow-900/30 font-bold' }} hover:bg-gray-100 dark:hover:bg-gray-700" onclick="toggleReadStatus({{ $file->id }})" style="cursor: pointer;">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center space-x-2">
+                            <!-- Hidden Checkbox (for sorting purposes) -->
+                            <input type="checkbox"
+                                   class="hidden toggle-read"
+                                   data-file-id="{{ $file->id }}"
+                                   {{ !$file->isReadByCurrentUser() ? '' : 'checked' }}
+                                   onchange="toggleReadStatus({{ $file->id }})">
+                            <!-- Font Awesome Envelope Icon -->
+                            <span class="read-icon" data-file-id="{{ $file->id }}" aria-label="{{ $file->isReadByCurrentUser() ? 'File read' : 'File unread' }}">
+                                @if($file->isReadByCurrentUser())
+                                    <!-- Open Envelope (Read) -->
+                                    <i class="text-gray-500 fas fa-envelope-open dark:text-gray-400"></i>
+                                @else
+                                    <!-- Closed Envelope (Unread) -->
+                                    <i class="text-gray-800 fas fa-envelope dark:text-gray-300"></i>
+                                @endif
+                            </span>
+                        </div>
+                    </td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-900">{{ $file->document_name ?? $file->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100" data-category-id="{{ $file->category ? $file->category->id : '' }}">
                         {{ $file->category ? $file->category->name : 'Uncategorized' }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap dark:text-gray-300">{{ $file->created_at->format('F d, Y h:i A') }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap dark:text-gray-300" data-upload-date="{{ $file->created_at->format('Y-m-d H:i:s') }}">
+                        {{ $file->created_at->format('F d, Y h:i A') }}
+                    </td>
                     <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap dark:text-gray-300">
                         <div class="flex space-x-2">
                             <!-- Preview Button -->
-                            <button onclick="previewFile('{{ asset('storage/' . $file->path) }}', '{{ Storage::mimeType($file->path) }}')"
-                                class="inline-flex items-center px-3 py-1 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                            <button onclick="event.stopPropagation(); previewFile('{{ asset('storage/' . $file->path) }}', '{{ Storage::mimeType($file->path) }}', {{ $file->id }})"
+                                    class="inline-flex items-center px-3 py-1 text-sm text-white rounded-md bg-customBlue hover:bg-customBlue">
+
                                 Preview
                             </button>
                             <!-- Download Button -->
-                            <a href="{{ route('file.download', $file) }}" class="inline-flex items-center px-3 py-1 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
+                            <a href="{{ route('file.download', $file) }}"
+                               onclick="event.stopPropagation(); markAsRead({{ $file->id }})"
+                               class="inline-flex items-center px-3 py-1 text-sm text-white rounded-md bg-customGreen hover:bg-customGreen">
                                 Download
                             </a>
                             @if(Auth::check() && Auth::user()->is_admin && Route::currentRouteName() !== 'dashboard')
                                 <form action="{{ route('file.destroy', $file->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700" onclick="return confirm('Are you sure you want to delete this file?')">
+                                    <button type="submit" class="inline-flex items-center px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700" onclick="event.stopPropagation(); return confirm('Are you sure you want to delete this file?')">
                                         Delete
                                     </button>
                                 </form>
@@ -73,17 +185,25 @@
                         </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <div class="flex flex-col items-center justify-center py-8">
+                                <!-- SVG Icon for Empty State -->
+                                <svg class="w-16 h-16 mb-4 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                </svg>
+                                <p class="text-sm text-red-400 dark:text-red-500">No files found.</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
     <div class="mt-4">
         {{ $files->links() }} <!-- Laravel Pagination -->
     </div>
-    <!-- No Files Message -->
-    @if($files->isEmpty())
-    <p class="mt-4 text-gray-600 dark:text-gray-300">No files uploaded yet.</p>
-    @endif
 </div>
 
 <!-- File Preview Modal -->
@@ -109,50 +229,76 @@
     let searchTimeout;
 
     function searchTable() {
-        let input = document.getElementById("searchInput").value.toLowerCase();
-        let categoryFilter = document.getElementById("categoryFilter").value; // Get selected category ID
-        let table = document.getElementById("filesTable");
-        let rows = table.getElementsByTagName("tr");
-        let spinner = document.getElementById("loadingSpinner");
+        return new Promise((resolve) => {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let categoryFilter = document.getElementById("categoryFilter").value;
+            let table = document.getElementById("filesTable");
+            let spinner = document.getElementById("loadingSpinner");
 
-        // Show the loading spinner
-        spinner.classList.remove("hidden");
+            spinner.classList.remove("hidden");
 
-        // Clear the previous timeout (debouncing)
-        clearTimeout(searchTimeout);
+            clearTimeout(searchTimeout);
 
-        // Delay the execution of filtering for a smooth experience
-        searchTimeout = setTimeout(() => {
-            for (let i = 1; i < rows.length; i++) { // Start from 1 to skip header row
-                let cells = rows[i].getElementsByTagName("td");
-                let fileName = cells[0]?.textContent.toLowerCase() || ''; // Document Name
-                let categoryId = cells[1]?.dataset.categoryId || ''; // Category ID from data attribute
+            searchTimeout = setTimeout(() => {
+                let isAdmin = {{ Auth::check() && Auth::user()->is_admin ? 'true' : 'false' }};
+                let fileNameIndex = isAdmin ? 0 : 1;
+                let categoryIndex = isAdmin ? 1 : 2;
 
-                // Match search input
-                let matchesSearch = fileName.includes(input);
+                // Fetch the current rows from the DOM
+                let rows = Array.from(table.getElementsByTagName("tr")).slice(1);
+                let visibleRows = 0;
 
-                // Match category filter
-                let matchesCategory = categoryFilter === '' || categoryId === categoryFilter;
+                rows.forEach(row => {
+                    let cells = row.getElementsByTagName("td");
+                    let fileName = cells[fileNameIndex]?.textContent.toLowerCase() || '';
+                    let categoryId = cells[categoryIndex]?.dataset.categoryId || '';
 
-                // Show/hide row based on both filters
-                if (matchesSearch && matchesCategory) {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
+                    let matchesSearch = fileName.includes(input);
+                    let matchesCategory = categoryFilter === '' || categoryId === categoryFilter;
+
+                    if (matchesSearch && matchesCategory) {
+                        row.style.display = '';
+                        visibleRows++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Remove existing "No files found" row if present
+                let noFilesRow = document.getElementById("noFilesRow");
+                if (noFilesRow) {
+                    noFilesRow.remove();
                 }
-            }
 
-            // Hide the loading spinner after filtering
-            spinner.classList.add("hidden");
-        }, 500); // Adjust delay time (500ms) for smooth filtering
+                // If no rows are visible, show the "No files found" message
+                if (visibleRows === 0) {
+                    let noFilesRow = document.createElement("tr");
+                    noFilesRow.id = "noFilesRow";
+                    noFilesRow.innerHTML = `
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <div class="flex flex-col items-center justify-center py-8">
+                                <!-- SVG Icon for Empty State -->
+                                <svg class="w-16 h-16 mb-4 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                </svg>
+                                <p class="text-sm text-red-400 dark:text-red-500">No files found.</p>
+                            </div>
+                        </td>
+                    `;
+                    table.querySelector("tbody").appendChild(noFilesRow);
+                }
+
+                spinner.classList.add("hidden");
+                resolve();
+            }, 500);
+        });
     }
 
-    // Filter table by category when the dropdown changes
     function filterTableByCategory() {
-        searchTable(); // Re-run the searchTable function with the new category filter
+        searchTable();
     }
 
-    function previewFile(fileUrl, fileType) {
+    function previewFile(fileUrl, fileType, fileId) {
         console.log('Previewing file:', fileUrl, 'Type:', fileType);
 
         const modal = document.getElementById('filePreviewModal');
@@ -182,12 +328,101 @@
                 <a href="${fileUrl}" class="text-blue-500 underline" target="_blank">Download file instead</a>`;
         }
 
+        markAsRead(fileId);
+
         modal.classList.remove('hidden');
     }
 
-    // Close Modal
     function closePreview() {
         document.getElementById('filePreviewModal').classList.add('hidden');
         document.getElementById('fileViewer').innerHTML = '';
+    }
+
+    function toggleReadStatus(fileId) {
+        console.log('Toggling read status for fileId:', fileId);
+        const checkbox = document.querySelector(`input[data-file-id="${fileId}"]`);
+        if (!checkbox) {
+            console.error(`Checkbox for fileId ${fileId} not found`);
+            return;
+        }
+        checkbox.checked = !checkbox.checked;
+
+        fetch(`/files/${fileId}/toggle-read`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ read: checkbox.checked })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = checkbox.closest('tr');
+                if (row) {
+                    row.classList.toggle('bg-yellow-50', !data.read);
+                    row.classList.toggle('dark:bg-yellow-900/30', !data.read);
+                    row.classList.toggle('font-bold', !data.read);
+                } else {
+                    console.error(`Row for fileId ${fileId} not found`);
+                }
+
+                const iconSpan = document.querySelector(`span.read-icon[data-file-id="${fileId}"]`);
+                if (iconSpan) {
+                    iconSpan.innerHTML = data.read
+                        ? `<i class="text-gray-500 fas fa-envelope-open dark:text-gray-400"></i>`
+                        : `<i class="text-gray-800 fas fa-envelope dark:text-gray-300"></i>`;
+                    iconSpan.setAttribute('aria-label', data.read ? 'File read' : 'File unread');
+                } else {
+                    console.error(`Icon span for fileId ${fileId} not found`);
+                }
+            } else {
+                checkbox.checked = !checkbox.checked;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            checkbox.checked = !checkbox.checked;
+        });
+    }
+
+    function markAsRead(fileId) {
+        console.log('Marking as read for fileId:', fileId);
+        fetch(`/files/${fileId}/toggle-read`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ read: true })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const checkbox = document.querySelector(`input[data-file-id="${fileId}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        row.classList.remove('bg-yellow-50');
+                        row.classList.remove('dark:bg-yellow-900/30');
+                        row.classList.remove('font-bold');
+                    } else {
+                        console.error(`Row for fileId ${fileId} not found`);
+                    }
+
+                    const iconSpan = document.querySelector(`span.read-icon[data-file-id="${fileId}"]`);
+                    if (iconSpan) {
+                        iconSpan.innerHTML = `<i class="text-gray-500 fas fa-envelope-open dark:text-gray-400"></i>`;
+                        iconSpan.setAttribute('aria-label', 'File read');
+                    } else {
+                        console.error(`Icon span for fileId ${fileId} not found`);
+                    }
+                } else {
+                    console.error(`Checkbox for fileId ${fileId} not found`);
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 </script>

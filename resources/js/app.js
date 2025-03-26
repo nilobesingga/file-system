@@ -1,5 +1,6 @@
 import './bootstrap';
 import 'dropzone/dist/dropzone.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 // import { pdfjsLib } from 'pdfjs-dist/build/pdf';
 import Dropzone from 'dropzone';
 import Alpine from 'alpinejs';

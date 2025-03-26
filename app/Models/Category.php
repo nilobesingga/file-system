@@ -8,10 +8,7 @@ class Category extends Model
 {
     protected $table = "categories";
     protected $primaryKey = "id";
-    protected $fillable = [
-        'name',
-        'description'
-    ];
+    protected $guarded = ["id"];
 
     // Relationship with users (many-to-many)
     public function users()

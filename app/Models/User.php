@@ -46,20 +46,6 @@ class User extends Authenticatable
         'is_admin' => 'boolean'
     ];
 
-    // /**
-    //  * Get the attributes that should be cast.
-    //  *
-    //  * @return array<string, string>
-    //  */
-    // protected function casts(): array
-    // {
-    //     return [
-    //         'email_verified_at' => 'datetime',
-    //         'password' => 'hashed',
-    //         'is_admin' => 'boolean'
-    //     ];
-    // }
-
     // Relationship with categories (many-to-many)
     public function categories()
     {
@@ -81,5 +67,12 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->is_admin; // ✅ Accessor for checking admin status
+    }
+
+    public function readFiles()
+    {
+        return $this->belongsToMany(Files::class, 'file_user', 'user_id', 'file_id')
+                    ->withPivot('read_at')
+                    ->withTimestamps();
     }
 }

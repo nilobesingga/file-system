@@ -1,7 +1,8 @@
 <?php
-
 namespace App\Helpers;
 
+use App\Models\Files;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class FileHelper
@@ -38,5 +39,44 @@ class FileHelper
         $sizeUnits = ['B', 'KB', 'MB', 'GB', 'TB'];
         $factor = floor((strlen($bytes) - 1) / 3);
         return sprintf("%.{$decimal}f", $bytes / pow(1024, $factor)) . ' ' . $sizeUnits[$factor];
+    }
+
+    /**
+     * Get unread files count
+     */
+    public static function getNotication()
+    {
+        $unreadFilesCount = Files::whereDoesntHave('readers', function ($query) {
+            $query->where('user_id', Auth::id());
+        })->count();
+        return $unreadFilesCount;
+    }
+
+    /**
+     * Get unread files
+     */
+    public static function getUnreadFiles()
+    {
+        return Files::whereDoesntHave('readers', function ($query) {
+            $query->where('user_id', Auth::id());
+        })->get();
+    }
+
+    /**
+     * Get unread notifications
+     */
+    public static function getUnreadNotifications()
+    {
+        $unreadFiles = self::getUnreadFiles();
+        $notifications = [];
+
+        foreach ($unreadFiles as $file) {
+            $notifications[] = [
+                'id' => $file->id,
+                'message' => $file->document_name,
+            ];
+        }
+
+        return $notifications;
     }
 }

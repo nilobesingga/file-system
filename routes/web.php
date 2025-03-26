@@ -26,7 +26,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Admin routes
-Route::middleware(['auth', Admin::class])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::post('/upload', [AdminController::class, 'upload'])->name('admin.upload');
@@ -65,8 +65,9 @@ Route::middleware('auth')->group(function () {
 });
 
 // User routes
-Route::middleware(['auth',EnsureTwoFactorVerified::class])->group(function () {
+Route::middleware(['auth','2fa'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/files/{file}/toggle-read', [DashboardController::class, 'toggleRead'])->name('file.toggle-read');
 });
 
 require __DIR__.'/auth.php';

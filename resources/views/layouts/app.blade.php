@@ -9,7 +9,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans antialiased" style="background-image: url('{{ asset('images/bg.png') }}'); background-size: cover; background-position: center;">
 
     <!-- Alpine.js Global State for Theme Color -->
     <div x-data="{
@@ -20,17 +20,19 @@
             }
         }"
         x-init="themeColor = localStorage.getItem('themeColor') || 'bg-gray-700'"
-        class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        class="flex flex-col min-h-screen ">
 
         @if(Auth::check() && Auth::user()->is_admin)
             <!-- Sidebar -->
-            <div class="fixed inset-y-0 left-0 z-40 w-64 text-white transition-all duration-300 shadow-xl rounded-r-3xl"
+            <div class="fixed inset-y-0 left-0 z-40 w-64 text-white transition-all duration-300 shadow-xl rounded-r-3xl "
                  :class="themeColor">
 
                 <div class="flex flex-col h-full">
                     <!-- Sidebar Header -->
-                    <div class="flex items-center p-4 space-x-3 border-b border-opacity-30">
-                        <h2 class="text-xl font-semibold ">Admin Panel</h2>
+                    <div class="flex items-center justify-center p-4 space-x-3 border-b-4 border-yellow-900 dark:bg-yellow-800 dark:border-yellow-700">
+                        <h2 class="text-xl font-semibold">
+                            <img src="{{ asset('images/logo.png') }}" class="w-auto h-8">
+                        </h2>
                     </div>
 
                     <!-- Sidebar Navigation -->
@@ -38,7 +40,7 @@
                         <ul class="space-y-2">
                             <li>
                                 <a href="{{ route('admin.dashboard') }}"
-                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-opacity-20">
+                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
                                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M9 21V9h6v12" />
                                     </svg>
@@ -47,7 +49,7 @@
                             </li>
                             <li>
                                 <a href="{{ route('admin.upload.show') }}"
-                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-opacity-20">
+                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.upload.show') ? 'bg-gray-700' : '' }}">
                                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m-7-7h14" />
                                     </svg>
@@ -56,7 +58,7 @@
                             </li>
                             <li>
                                 <a href="{{ route('admin.categories') }}"
-                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-opacity-20">
+                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.categories') ? 'bg-gray-700' : '' }}">
                                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
                                     </svg>
@@ -65,7 +67,7 @@
                             </li>
                             <li>
                                 <a href="{{ route('admin.users') }}"
-                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-opacity-20">
+                                   class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.users') ? 'bg-gray-700' : '' }}">
                                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                                     </svg>
@@ -99,10 +101,10 @@
         @endif
 
         <!-- Main Content -->
-        <div>
+        <div class="flex flex-col flex-1">
             <!-- Navigation Bar (Syncs with Sidebar) -->
             @if(Auth::check() && Auth::user()->is_admin)
-                <nav class="text-white transition-all duration-300"
+                <nav class="text-white transition-all duration-300 border-b-4 border-yellow-900 dark:bg-yellow-800 dark:border-yellow-700"
                     :class="themeColor">
                     <div class="{{ Auth::check() && Auth::user()->is_admin ? 'w-full' : 'max-w-7xl' }} px-2 mx-auto sm:px-6 lg:px-8">
                         <div class="flex justify-between h-16">
@@ -149,18 +151,18 @@
             @endif
 
             @isset($header)
-                <header class="transition-all duration-300 bg-white shadow dark:bg-gray-800" :class="themeColor">
+                <header class="transition-all duration-300 bg-black shadow dark:bg-gray-800" :class="themeColor">
                     <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>
             @endisset
 
-            <main class="p-6 transition-all duration-300 {{ Auth::check() && Auth::user()->is_admin ? 'ml-64' : '' }}">
+            <main class="flex-1 py-4 p-6 transition-all duration-300 {{ Auth::check() && Auth::user()->is_admin ? 'ml-64' : '' }}">
                 {{ $slot }}
             </main>
+            @include('layouts.footer')
         </div>
     </div>
-
 </body>
 </html>
