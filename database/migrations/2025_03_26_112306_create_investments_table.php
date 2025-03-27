@@ -11,17 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('investment', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('investment_type'); // Stocks, Bonds, Mutual Funds, Real Estate
-            $table->decimal('investment_amount', 15, 2);
-            $table->integer('number_of_units')->nullable(); // Number of stocks, bonds, etc.
-            $table->decimal('interest_rate', 5, 2)->nullable(); // Applicable for Bonds
-            $table->date('investment_date');
-            $table->timestamps();
-        });
-
+        if (!Schema::hasTable('investment')) {
+            Schema::create('investment', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('investment_type'); // Stocks, Bonds, Mutual Funds, Real Estate
+                $table->decimal('investment_amount', 15, 2);
+                $table->integer('number_of_units')->nullable(); // Number of stocks, bonds, etc.
+                $table->decimal('interest_rate', 5, 2)->nullable(); // Applicable for Bonds
+                $table->date('investment_date');
+                $table->timestamps();
+            });
+        }
 
     }
 
