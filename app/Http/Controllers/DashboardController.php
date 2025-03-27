@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $user = Auth::user();
 
@@ -23,30 +23,30 @@ class DashboardController extends Controller
         $categoryIds = CategoryUser::select('category_id')->where('user_id',$user->id)->pluck('category_id')->toArray(); // FIXED: Use correct relationship
 
         // Get sort parameters from the request (default to sorting by unread status)
-        // $sortBy = request('sort', 'unread');
-        // $sortDirection = request('direction', 'desc');
+        $sortBy = request('sort', 'unread');
+        $sortDirection = request('direction', 'desc');
 
         // Build query for fetching files
         $filesQuery = Files::with('user', 'category')->whereIn('category_id', $categoryIds);
 
         // Sorting logic
-        // if ($sortBy === 'unread') {
-        //     $filesQuery->leftJoin('file_user', function ($join) use ($user) {
-        //         $join->on('files.id', '=', 'file_user.file_id')
-        //              ->where('file_user.user_id', $user->id);
-        //     })
-        //     ->select('files.*')
-        //     ->orderByRaw("file_user.read_at IS NULL $sortDirection");
-        // } else {
-        //     if ($sortBy === 'document_name') {
-        //         $filesQuery->orderBy('document_name', $sortDirection);
-        //     } elseif ($sortBy === 'category') {
-        //         $filesQuery->join('categories', 'files.category_id', '=', 'categories.id')
-        //             ->orderBy('categories.name', $sortDirection);
-        //     } else {
-        //         $filesQuery->orderBy('created_at', $sortDirection);
-        //     }
-        // }
+        if ($sortBy === 'unread') {
+            $filesQuery->leftJoin('file_user', function ($join) use ($user) {
+                $join->on('files.id', '=', 'file_user.file_id')
+                     ->where('file_user.user_id', $user->id);
+            })
+            ->select('files.*')
+            ->orderByRaw("file_user.read_at IS NULL $sortDirection");
+        } else {
+            if ($sortBy === 'document_name') {
+                $filesQuery->orderBy('document_name', $sortDirection);
+            } elseif ($sortBy === 'category') {
+                $filesQuery->join('categories', 'files.category_id', '=', 'categories.id')
+                    ->orderBy('categories.name', $sortDirection);
+            } else {
+                $filesQuery->orderBy('created_at', $sortDirection);
+            }
+        }
 
         // Paginate results
         $files = $filesQuery->paginate(15);
@@ -54,16 +54,14 @@ class DashboardController extends Controller
         $storageUsage = 0;
 
         // Count recent uploads (last 7 days)
-        $recentUploadsCount = 0;
-        // Files::whereIn('category_id', $categoryIds)
-        //     ->where('created_at', '>=', now()->subDays(7))
-        //     ->count();
+        $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
 
         // Count new files uploaded today
-        $newFiles = 0;
-        // Files::whereIn('category_id', $categoryIds)
-        //     ->where('created_at', '>=', now()->startOfDay())
-        //     ->count();
+        $newFiles = Files::whereIn('category_id', $categoryIds)
+            ->where('created_at', '>=', now()->startOfDay())
+            ->count();
 
         // Get all categories
         $category = Category::all();
@@ -74,34 +72,34 @@ class DashboardController extends Controller
         $numberOfBonds = 0;
 
         // Generate Monthly Investment Data
-        // $currentMonth = Carbon::now()->month;
-        // $weeklyInvestments = array_fill(0, $currentMonth, 0);
-        // $weeklyBonds = array_fill(0, $currentMonth, 0);
+        $currentMonth = Carbon::now()->month;
+        $weeklyInvestments = array_fill(0, $currentMonth, 0);
+        $weeklyBonds = array_fill(0, $currentMonth, 0);
 
-        // for ($i = 0; $i < $currentMonth; $i++) {
-        //     $weeklyInvestments[$i] = 10000 + ($i * 5000);
-        //     $weeklyBonds[$i] = 2 + $i;
-        // }
+        for ($i = 0; $i < $currentMonth; $i++) {
+            $weeklyInvestments[$i] = 0 + ($i * 0);
+            $weeklyBonds[$i] = $i * 0;
+        }
 
         // Generate Month Labels
-        // $labels = [];
-        // for ($i = 0; $i < $currentMonth; $i++) {
-        //     $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
-        // }
+        $labels = [];
+        for ($i = 0; $i < $currentMonth; $i++) {
+            $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
+        }
 
         return view('dashboard', compact(
             'files',
-            // 'newFiles',
-            // 'totalFiles',
-            // 'storageUsage',
-            // 'recentUploadsCount',
+            'newFiles',
+            'totalFiles',
+            'storageUsage',
+            'recentUploadsCount',
             'category',
-            // 'amountInvested',
-            // 'currency',
-            // 'numberOfBonds',
-            // 'weeklyInvestments',
-            // 'weeklyBonds',
-            // 'labels'
+            'amountInvested',
+            'currency',
+            'numberOfBonds',
+            'weeklyInvestments',
+            'weeklyBonds',
+            'labels'
         ));
     }
 
