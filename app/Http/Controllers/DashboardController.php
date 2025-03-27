@@ -27,7 +27,7 @@ class DashboardController extends Controller
         $sortDirection = request('direction', 'desc');
 
         // Build query for fetching files
-        $filesQuery = Files::with('user', 'category')->whereIn('category_id', $categoryIds);
+        $filesQuery = Files::with('user', 'category')->where('is_delete',0)->whereIn('category_id', $categoryIds);
 
         // Sorting logic
         if ($sortBy === 'unread') {

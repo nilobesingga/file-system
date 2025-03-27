@@ -17,7 +17,7 @@ class AdminController extends Controller
         if (!Auth::user()->is_admin) {
             abort(403, 'Unauthorized action.');
         }
-        $files = Files::where('user_id',Auth::user()->id)->with('user', 'category')->latest()->paginate(15);
+        $files = Files::where('user_id',Auth::user()->id)->where('is_delete',0)->with('user', 'category')->latest()->paginate(15);
         $categories = Category::all();
         $users = User::all();
 
