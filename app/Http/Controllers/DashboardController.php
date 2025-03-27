@@ -23,8 +23,8 @@ class DashboardController extends Controller
         $categoryIds = CategoryUser::select('category_id')->where('user_id',$user->id)->pluck('category_id')->toArray(); // FIXED: Use correct relationship
 
         // Get sort parameters from the request (default to sorting by unread status)
-        $sortBy = request('sort', 'unread');
-        $sortDirection = request('direction', 'desc');
+        // $sortBy = request('sort', 'unread');
+        // $sortDirection = request('direction', 'desc');
 
         // Build query for fetching files
         $filesQuery = Files::with('user', 'category')->whereIn('category_id', $categoryIds);
