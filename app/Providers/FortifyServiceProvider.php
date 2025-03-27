@@ -23,7 +23,6 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(function () {
             return view('auth.login');
         });
-        $this->configureRoutes();
         // Override login response
         $this->app->singleton(LoginResponseContract::class, function () {
             return new class implements LoginResponseContract {
@@ -44,22 +43,6 @@ class FortifyServiceProvider extends ServiceProvider
         // Rate limiter for 2FA
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->user()->id ?? $request->ip());
-        });
-    }
-
-    protected function configureRoutes()
-    {
-        Route::group([
-            'middleware' => ['web'],
-            'as' => 'verification.',
-        ], function () {
-            Route::get('/verify-email', [EmailVerificationPromptController::class, '__invoke'])
-                ->middleware('auth')
-                ->name('notice');
-
-            Route::get('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
-                ->middleware(['auth', 'signed', 'throttle:6,1'])
-                ->name('verify');
         });
     }
 }
