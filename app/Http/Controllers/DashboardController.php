@@ -14,6 +14,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        dd(Auth::user());
         $user = User::where('id',Auth::user()->id)->first();
         $categories = $user->category; // Get user's categories
         $categoryIds = $categories->pluck('id')->toArray();
