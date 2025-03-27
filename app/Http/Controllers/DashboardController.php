@@ -50,16 +50,18 @@ class DashboardController extends Controller
 
         // Paginate results
         $files = $filesQuery->paginate(15);
-        $totalFiles = Files::whereIn('category_id', $categoryIds)->count();
+        $totalFiles = Files::whereIn('category_id', $categoryIds)->where('is_delete',0)->count();
         $storageUsage = 0;
 
         // Count recent uploads (last 7 days)
         $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
+            ->where('is_delete',0)
             ->where('created_at', '>=', now()->subDays(7))
             ->count();
 
         // Count new files uploaded today
         $newFiles = Files::whereIn('category_id', $categoryIds)
+            ->where('is_delete',0)
             ->where('created_at', '>=', now()->startOfDay())
             ->count();
 
