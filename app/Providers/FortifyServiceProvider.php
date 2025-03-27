@@ -51,15 +51,6 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Route::group([
             'middleware' => ['web'],
-            'as' => 'password.',
-        ], function () {
-            Route::get('/confirm-password', [ConfirmablePasswordController::class, 'show'])
-                ->middleware('auth')
-                ->name('confirm');
-        });
-
-        Route::group([
-            'middleware' => ['web'],
             'as' => 'verification.',
         ], function () {
             Route::get('/verify-email', [EmailVerificationPromptController::class, '__invoke'])
