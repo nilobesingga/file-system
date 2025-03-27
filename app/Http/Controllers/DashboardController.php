@@ -13,6 +13,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        return view('dashboard');
+    }
+    public function index1()
+    {
         $user = Auth::user();
 
         if (!$user) {
