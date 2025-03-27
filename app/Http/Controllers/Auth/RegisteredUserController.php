@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', 'min:8'],
-            'category_id' => ['required', 'exists:categories,id'],
+            // 'category_id' => ['required', 'exists:categories,id'],
         ]);
 
         $user = User::create([
