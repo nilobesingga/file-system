@@ -3,49 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\CategoryUser;
 use App\Models\Files;
-use App\Models\User;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        try {
-            $user = Auth::user();
+        $user = Auth::user();
 
-            // Validate if the user exists
-            if (!$user) {
-                abort(403, 'Unauthorized action.');
-            }
+        if (!$user) {
+            return redirect()->route('login');
+        }
 
-            // Fetch user's categories
-            $categories = $user->category; // Ensure the `category` relationship exists
-            if (!$categories) {
-                return back()->withErrors(['error' => 'No categories found for the user.']);
-            }
+        // Ensure the user has the correct relationship
+        $categoryIds = CategoryUser::select('category_id')->where('user_id',$user->id)->pluck('category_id')->toArray(); // FIXED: Use correct relationship
 
-            $categoryIds = $categories->pluck('id')->toArray();
+        // Get sort parameters from the request (default to sorting by unread status)
+        $sortBy = request('sort', 'unread');
+        $sortDirection = request('direction', 'desc');
 
-            // Build the query for files
-            $sortBy = request('sort', 'unread'); // Default to sorting by unread status
-            $sortDirection = request('direction', 'desc'); // Default to descending
+        // Build query for fetching files
+        $filesQuery = Files::with('user', 'category')->whereIn('category_id', $categoryIds);
 
-            $filesQuery = Files::with('user', 'category')
-                ->whereIn('category_id', $categoryIds);
-
-            // Apply sorting
-            if ($sortBy === 'unread') {
-                $filesQuery->leftJoin('file_user', function ($join) use ($user) {
-                    $join->on('files.id', '=', 'file_user.file_id')
-                        ->where('file_user.user_id', $user->id);
-                })
-                    ->select('files.*')
-                    ->orderByRaw("CASE WHEN file_user.read_at IS NULL THEN 0 ELSE 1 END $sortDirection");
-            } elseif ($sortBy === 'document_name') {
+        // Sorting logic
+        if ($sortBy === 'unread') {
+            $filesQuery->leftJoin('file_user', function ($join) use ($user) {
+                $join->on('files.id', '=', 'file_user.file_id')
+                     ->where('file_user.user_id', $user->id);
+            })
+            ->select('files.*')
+            ->orderByRaw("IFNULL(file_user.read_at, '9999-12-31') $sortDirection");
+        } else {
+            if ($sortBy === 'document_name') {
                 $filesQuery->orderBy('document_name', $sortDirection);
             } elseif ($sortBy === 'category') {
                 $filesQuery->join('categories', 'files.category_id', '=', 'categories.id')
@@ -53,78 +46,77 @@ class DashboardController extends Controller
             } else {
                 $filesQuery->orderBy('created_at', $sortDirection);
             }
-
-            // Paginate the results
-            $files = $filesQuery->latest()->paginate(15);
-
-            // Calculate additional data
-            $totalFiles = $files->count();
-            $storageUsage = 0; // Replace with actual logic if needed
-            $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
-                ->where('created_at', '>=', now()->subDays(7))
-                ->count();
-            $newFiles = Files::whereIn('category_id', $categoryIds)
-                ->where('created_at', '>=', now()->startOfDay())
-                ->count();
-            $category = Category::all();
-
-            // Mock investment data
-            $amountInvested = 0.00; // Replace with actual logic if needed
-            $currency = 'USD';
-            $numberOfBonds = 0; // Replace with actual logic if needed
-
-            // Mock monthly investment amounts (from January to current month)
-            $currentMonth = Carbon::now()->month;
-            $weeklyInvestments = array_fill(0, $currentMonth, 0);
-            $weeklyBonds = array_fill(0, $currentMonth, 0);
-
-            for ($i = 0; $i < $currentMonth; $i++) {
-                $weeklyInvestments[$i] = 10000 + ($i * 5000); // Example data
-                $weeklyBonds[$i] = 2 + $i; // Example data
-            }
-
-            // Generate month labels (e.g., "January", "February")
-            $labels = [];
-            for ($i = 0; $i < $currentMonth; $i++) {
-                $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
-            }
-
-            return view('dashboard', compact(
-                'files',
-                'newFiles',
-                'totalFiles',
-                'storageUsage',
-                'recentUploadsCount',
-                'categories',
-                'category',
-                'amountInvested',
-                'currency',
-                'numberOfBonds',
-                'weeklyInvestments',
-                'weeklyBonds',
-                'labels'
-            ));
-        } catch (\Exception $e) {
-            // Log the error for debugging
-            \Log::error('Error in DashboardController@index: ' . $e->getMessage());
-
-            // Return a user-friendly error message
-            return back()->withErrors(['error' => 'An error occurred while loading the dashboard. Please try again later.']);
         }
+
+        // Paginate results
+        $files = $filesQuery->paginate(15);
+        $totalFiles = Files::whereIn('category_id', $categoryIds)->count();
+        $storageUsage = 0;
+
+        // Count recent uploads (last 7 days)
+        $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
+
+        // Count new files uploaded today
+        $newFiles = Files::whereIn('category_id', $categoryIds)
+            ->where('created_at', '>=', now()->startOfDay())
+            ->count();
+
+        // Get all categories
+        $category = Category::all();
+
+        // Mock Investment Data
+        $amountInvested = 0.00;
+        $currency = 'USD';
+        $numberOfBonds = 0;
+
+        // Generate Monthly Investment Data
+        $currentMonth = Carbon::now()->month;
+        $weeklyInvestments = array_fill(0, $currentMonth, 0);
+        $weeklyBonds = array_fill(0, $currentMonth, 0);
+
+        for ($i = 0; $i < $currentMonth; $i++) {
+            $weeklyInvestments[$i] = 10000 + ($i * 5000);
+            $weeklyBonds[$i] = 2 + $i;
+        }
+
+        // Generate Month Labels
+        $labels = [];
+        for ($i = 0; $i < $currentMonth; $i++) {
+            $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
+        }
+
+        return view('dashboard', compact(
+            'files',
+            'newFiles',
+            'totalFiles',
+            'storageUsage',
+            'recentUploadsCount',
+            'category',
+            'amountInvested',
+            'currency',
+            'numberOfBonds',
+            'weeklyInvestments',
+            'weeklyBonds',
+            'labels'
+        ));
     }
 
     public function toggleRead(Request $request, Files $file)
     {
         $user = Auth::user();
-        $isRead = $request->input('read', true); // Default to true if not provided
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $isRead = $request->input('read', true);
 
         if ($isRead) {
-            // Mark as read (attach the user to the file)
             if (!$file->readers()->where('user_id', $user->id)->exists()) {
                 $file->readers()->attach($user->id, ['read_at' => now()]);
             }
         } else {
-            // Mark as unread (detach the user from the file)
             $file->readers()->detach($user->id);
         }
 
