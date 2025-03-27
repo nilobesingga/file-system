@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -30,23 +30,23 @@ class DashboardController extends Controller
         $filesQuery = Files::with('user', 'category')->whereIn('category_id', $categoryIds);
 
         // Sorting logic
-        if ($sortBy === 'unread') {
-            $filesQuery->leftJoin('file_user', function ($join) use ($user) {
-                $join->on('files.id', '=', 'file_user.file_id')
-                     ->where('file_user.user_id', $user->id);
-            })
-            ->select('files.*')
-            ->orderByRaw("file_user.read_at IS NULL $sortDirection");
-        } else {
-            if ($sortBy === 'document_name') {
-                $filesQuery->orderBy('document_name', $sortDirection);
-            } elseif ($sortBy === 'category') {
-                $filesQuery->join('categories', 'files.category_id', '=', 'categories.id')
-                    ->orderBy('categories.name', $sortDirection);
-            } else {
-                $filesQuery->orderBy('created_at', $sortDirection);
-            }
-        }
+        // if ($sortBy === 'unread') {
+        //     $filesQuery->leftJoin('file_user', function ($join) use ($user) {
+        //         $join->on('files.id', '=', 'file_user.file_id')
+        //              ->where('file_user.user_id', $user->id);
+        //     })
+        //     ->select('files.*')
+        //     ->orderByRaw("file_user.read_at IS NULL $sortDirection");
+        // } else {
+        //     if ($sortBy === 'document_name') {
+        //         $filesQuery->orderBy('document_name', $sortDirection);
+        //     } elseif ($sortBy === 'category') {
+        //         $filesQuery->join('categories', 'files.category_id', '=', 'categories.id')
+        //             ->orderBy('categories.name', $sortDirection);
+        //     } else {
+        //         $filesQuery->orderBy('created_at', $sortDirection);
+        //     }
+        // }
 
         // Paginate results
         $files = $filesQuery->paginate(15);
