@@ -25,7 +25,7 @@ class DashboardWidget extends Component
         $weeklyBonds,
         $labels,
         $recentUploadsCount,
-        $newFiles = 0
+        $newFiles
         ){
         $this->totalFiles = $totalFiles;
         $this->amountInvested = $amountInvested;

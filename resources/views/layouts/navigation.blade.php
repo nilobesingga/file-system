@@ -4,7 +4,7 @@
             <div class="flex">
                 <div class="flex items-center shrink-0">
                     <a href="{{ route('dashboard') }}" class="flex items-center">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Laravel') }}" class="w-auto h-8">
+                        <img src="{{ asset('images/SkyHybrid.png') }}" alt="{{ config('app.name', 'Laravel') }}" class="w-auto h-8">
                     </a>
                 </div>
             </div>

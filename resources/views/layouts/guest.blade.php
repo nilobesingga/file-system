@@ -46,15 +46,12 @@
     </head>
     <body class="font-sans antialiased" style="background-image: url('{{ asset('images/bg.png') }}'); background-size: cover; background-position: center;">
         <div class="flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 ">
-            <div>
-                <a href="/">
-                    {{-- <x-application-logo class="w-20 h-20 text-gray-500" /> --}}
-                    <img src="{{ asset('images/CLP-White.svg') }}" alt="{{ config('app.name', 'CapLionPoint') }}" class="w-auto h-20">
-
-                </a>
-            </div>
-
             <div class="w-full px-6 py-6 mt-6 overflow-hidden bg-white border border-gray-300 shadow-lg sm:max-w-md dark:bg-gray-800 sm:rounded-lg card">
+                <div class="flex justify-center mb-6">
+                    <a href="/">
+                        <img src="{{ asset('images/SkyHybrid.png') }}" alt="{{ config('app.name', 'SkyHybrid') }}" class="w-auto h-20">
+                    </a>
+                </div>
                 {{ $slot }}
             </div>
         </div>
