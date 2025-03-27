@@ -22,14 +22,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('investment_statistics', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('investment_id')->constrained()->onDelete('cascade');
-            $table->decimal('monthly_investment', 15, 2);
-            $table->decimal('monthly_interest', 15, 2)->nullable();
-            $table->date('month');
-            $table->timestamps();
-        });
+
     }
 
     /**
@@ -38,6 +31,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('investment');
-        Schema::dropIfExists('investment_statistics');
     }
 };
