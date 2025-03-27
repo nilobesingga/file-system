@@ -13,10 +13,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard');
-    }
-    public function index1()
-    {
         $user = Auth::user();
 
         if (!$user) {
@@ -40,7 +36,7 @@ class DashboardController extends Controller
                      ->where('file_user.user_id', $user->id);
             })
             ->select('files.*')
-            ->orderByRaw("IFNULL(file_user.read_at, '9999-12-31') $sortDirection");
+            ->orderByRaw("file_user.read_at IS NULL $sortDirection");
         } else {
             if ($sortBy === 'document_name') {
                 $filesQuery->orderBy('document_name', $sortDirection);
@@ -58,14 +54,16 @@ class DashboardController extends Controller
         $storageUsage = 0;
 
         // Count recent uploads (last 7 days)
-        $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
-            ->where('created_at', '>=', now()->subDays(7))
-            ->count();
+        $recentUploadsCount = 0;
+        // Files::whereIn('category_id', $categoryIds)
+        //     ->where('created_at', '>=', now()->subDays(7))
+        //     ->count();
 
         // Count new files uploaded today
-        $newFiles = Files::whereIn('category_id', $categoryIds)
-            ->where('created_at', '>=', now()->startOfDay())
-            ->count();
+        $newFiles = 0;
+        // Files::whereIn('category_id', $categoryIds)
+        //     ->where('created_at', '>=', now()->startOfDay())
+        //     ->count();
 
         // Get all categories
         $category = Category::all();
@@ -76,34 +74,34 @@ class DashboardController extends Controller
         $numberOfBonds = 0;
 
         // Generate Monthly Investment Data
-        $currentMonth = Carbon::now()->month;
-        $weeklyInvestments = array_fill(0, $currentMonth, 0);
-        $weeklyBonds = array_fill(0, $currentMonth, 0);
+        // $currentMonth = Carbon::now()->month;
+        // $weeklyInvestments = array_fill(0, $currentMonth, 0);
+        // $weeklyBonds = array_fill(0, $currentMonth, 0);
 
-        for ($i = 0; $i < $currentMonth; $i++) {
-            $weeklyInvestments[$i] = 10000 + ($i * 5000);
-            $weeklyBonds[$i] = 2 + $i;
-        }
+        // for ($i = 0; $i < $currentMonth; $i++) {
+        //     $weeklyInvestments[$i] = 10000 + ($i * 5000);
+        //     $weeklyBonds[$i] = 2 + $i;
+        // }
 
         // Generate Month Labels
-        $labels = [];
-        for ($i = 0; $i < $currentMonth; $i++) {
-            $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
-        }
+        // $labels = [];
+        // for ($i = 0; $i < $currentMonth; $i++) {
+        //     $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
+        // }
 
         return view('dashboard', compact(
             'files',
-            'newFiles',
-            'totalFiles',
-            'storageUsage',
-            'recentUploadsCount',
+            // 'newFiles',
+            // 'totalFiles',
+            // 'storageUsage',
+            // 'recentUploadsCount',
             'category',
-            'amountInvested',
-            'currency',
-            'numberOfBonds',
-            'weeklyInvestments',
-            'weeklyBonds',
-            'labels'
+            // 'amountInvested',
+            // 'currency',
+            // 'numberOfBonds',
+            // 'weeklyInvestments',
+            // 'weeklyBonds',
+            // 'labels'
         ));
     }
 
