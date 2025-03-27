@@ -46,7 +46,7 @@ class FileHelper
      */
     public static function getNotication()
     {
-        $unreadFilesCount = Files::whereDoesntHave('readers', function ($query) {
+        $unreadFilesCount = Files::where('is_delete', 0)->whereDoesntHave('readers', function ($query) {
             $query->where('user_id', Auth::id());
         })->count();
         return $unreadFilesCount;
@@ -57,7 +57,7 @@ class FileHelper
      */
     public static function getUnreadFiles()
     {
-        return Files::whereDoesntHave('readers', function ($query) {
+        return Files::where('is_delete', 0)->whereDoesntHave('readers', function ($query) {
             $query->where('user_id', Auth::id());
         })->get();
     }

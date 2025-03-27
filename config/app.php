@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'CapLionPoint'),
+    'name' => env('APP_NAME', 'SkyHybrid'),
 
     /*
     |--------------------------------------------------------------------------

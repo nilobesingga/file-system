@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>CapLionPoint</title>
+    <title>SkyHybrid</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -31,7 +31,7 @@
                     <!-- Sidebar Header -->
                     <div class="flex items-center justify-center p-4 space-x-3 border-b-4 border-yellow-900 dark:bg-yellow-800 dark:border-yellow-700">
                         <h2 class="text-xl font-semibold">
-                            <img src="{{ asset('images/logo.png') }}" class="w-auto h-8">
+                            <img src="{{ asset('images/SkyHybrid.png') }}" class="w-auto h-8">
                         </h2>
                     </div>
 
