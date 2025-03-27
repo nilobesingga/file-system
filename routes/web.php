@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // User routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','2fa'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/files/{file}/toggle-read', [DashboardController::class, 'toggleRead'])->name('file.toggle-read');
 });
