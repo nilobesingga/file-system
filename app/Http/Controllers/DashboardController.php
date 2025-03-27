@@ -14,7 +14,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        dd(Auth::user());
         $user = User::where('id',Auth::user()->id)->first();
         $categories = $user->category; // Get user's categories
         $categoryIds = $categories->pluck('id')->toArray();
@@ -83,7 +82,7 @@ class DashboardController extends Controller
         for ($i = 0; $i < $currentMonth; $i++) {
             $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
         }
-
+        dd(Auth::user());
         return view('dashboard', compact(
             'files',
             'newFiles',
