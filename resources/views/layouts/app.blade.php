@@ -30,7 +30,7 @@
 
                 <div class="flex flex-col h-full">
                     <!-- Sidebar Header -->
-                    <div class="flex items-center justify-center p-4 space-x-3 border-b-4 border-yellow-900 dark:bg-yellow-800 dark:border-yellow-700">
+                    <div class="flex items-center justify-center p-4 space-x-3 bg-white border-b-4 border-yellow-900 dark:bg-white dark:border-yellow-700">
                         <h2 class="text-xl font-semibold">
                             <img src="{{ asset('images/SkyHybrid.png') }}" class="w-auto h-8">
                         </h2>
@@ -105,7 +105,7 @@
         <div class="flex flex-col flex-1">
             <!-- Navigation Bar (Syncs with Sidebar) -->
             @if(Auth::check() && Auth::user()->is_admin)
-                <nav class="text-white transition-all duration-300 border-b-4 border-yellow-900 dark:bg-yellow-800 dark:border-yellow-700"
+                <nav class="transition-all duration-300 bg-white border-b-4 border-yellow-900 dark:bg-white dark:text-dark dark:border-yellow-700"
                     :class="themeColor">
                     <div class="{{ Auth::check() && Auth::user()->is_admin ? 'w-full' : 'max-w-7xl' }} px-2 mx-auto sm:px-6 lg:px-8">
                         <div class="flex justify-between h-16">
@@ -121,11 +121,10 @@
                                 <div class="relative ml-3">
                                     <x-dropdown align="right" width="48">
                                         <x-slot name="trigger">
-                                            <button class="flex items-center text-sm font-medium text-white hover:text-gray-300">
+                                            <button class="flex items-center text-sm font-medium text-dark hover:text-gray-700">
                                                 <!-- Profile Image or Default Avatar -->
                                                 <img class="w-8 h-8 mr-2 rounded-full"
-                                                    src="{{ Auth::user()->profile_photo_url ?? 'https://i.pravatar.cc/150?u=' . md5(Auth::user()->email) }}"
-                                                    alt="{{ Auth::user()->name }}">
+                                                    src="{{ asset('images/SkyHybrid.png') }}"/>
                                                 {{ Auth::user()->name }}
                                             </button>
                                         </x-slot>

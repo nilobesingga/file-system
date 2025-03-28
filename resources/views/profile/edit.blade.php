@@ -20,10 +20,10 @@
             </div>
             <div class="p-4 bg-white shadow sm:p-8 dark:bg-gray-800 sm:rounded-lg">
                 <div class="max-w-xl">
-                    <h2 class="mb-2">Two-Factor Authentication</h2>
+                    <h2 class="mb-2 text-dark dark:text-white">Two-Factor Authentication</h2>
 
                     @if (session('status') === 'two-factor-authentication-enabled')
-                            <p class="mb-4 text-center text-gray-700">Please scan the QR code and confirm your setup.</p>
+                            <p class="mb-4 text-center text-gray-700 dark:text-white">Please scan the QR code and confirm your setup.</p>
 
                             <div class="flex justify-center mb-6">
                                 {!! Auth::user()->twoFactorQrCodeSvg() !!}
@@ -60,7 +60,7 @@
                         @else
                             <form method="POST" action="/user/two-factor-authentication">
                                 @csrf
-                                <button type="submit" class="px-4 py-2 text-blue-500 transition duration-200 border-2 border-blue-500 rounded-lg hover:bg-blue-500 hover:text-white">
+                                <button type="submit" class="px-4 py-2 transition duration-200 border-2 border-blue-500 rounded-lg text-dark hover:bg-blue-500 hover:text-white dark:text-white">
                                     Enable 2FA
                                 </button>
                             </form>

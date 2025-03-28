@@ -1,7 +1,7 @@
 <div class="p-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
     <!-- Search Bar with Loading Indicator -->
     <div class="relative flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Files</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Files</h3>
 
         <div class="flex items-center space-x-4">
             <!-- Category Filter Dropdown -->
@@ -152,7 +152,7 @@
                             </span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-900">{{ $file->document_name ?? $file->name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->document_name ?? $file->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100" data-category-id="{{ $file->category ? $file->category->id : '' }}">
                         {{ $file->category ? $file->category->name : 'Uncategorized' }}
                     </td>
