@@ -147,7 +147,7 @@ new Chart(weeklyInvestmentCtx, {
         labels: @json($labels),
         datasets: [{
             label: 'Amount Invested ($)',
-            data: @json($weeklyInvestments),
+            data: @json($monthlyInvestments),
             backgroundColor: '#22518E', // Blue with transparency
             borderColor: 'rgba(59, 130, 246, 1)', // Solid blue border
             borderWidth: 1,
@@ -198,7 +198,7 @@ new Chart(weeklyBondsCtx, {
         labels: @json($labels),
         datasets: [{
             label: 'Number of Bonds',
-            data: @json($weeklyBonds),
+            data: @json($monthlyBonds),
             backgroundColor: '#11CABE', // Teal with transparency
             borderColor: 'rgba(20, 184, 166, 1)', // Solid teal border
             borderWidth: 1,

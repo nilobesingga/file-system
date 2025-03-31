@@ -43,7 +43,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'is_admin' => 'boolean'
+        'is_admin' => 'boolean',
+        'force_password_change' => 'boolean'
     ];
 
     // Relationship with categories (many-to-many)

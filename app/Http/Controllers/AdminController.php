@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Files;
+use App\Models\Investment;
+use App\Models\InvestmentStatistic;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,13 +19,13 @@ class AdminController extends Controller
         if (!Auth::user()->is_admin) {
             abort(403, 'Unauthorized action.');
         }
-        $files = Files::where('user_id',Auth::user()->id)->where('is_delete',0)->with('user', 'category')->latest()->paginate(15);
+        $files = Files::where('created_by',Auth::user()->id)->where('is_delete',0)->with('user', 'category')->latest()->paginate(15);
         $categories = Category::all();
         $users = User::all();
 
         $totalFiles = $files->count();
         $storageUsage = \App\Helpers\FileHelper::getTotalSize();
-        $recentUploadsCount = Files::where('user_id',Auth::user()->id)->where('created_at', '>=', now()->subDays(7))->count();
+        $recentUploadsCount = Files::where('created_by',Auth::user()->id)->where('created_at', '>=', now()->subDays(7))->count();
         return view('admin.dashboard', compact('files', 'categories', 'users', 'totalFiles', 'storageUsage', 'recentUploadsCount'));
     }
 
@@ -34,12 +36,24 @@ class AdminController extends Controller
             'file' => 'required|array',
             'file.*' => 'max:10000', // Validate each file
             'category_id' => 'required|exists:categories,id',
-            'document_name' => 'required|string|max:255'
+            'document_name' => 'required|string|max:255',
+            'user_id' => 'required|exists:users,id',
+            'statement_no' => 'required',
+            'statement_period' => 'required',
+            'number_of_bonds' => 'required',
+            'amount_subscribed' => 'required|numeric',
+            'currency' => 'required|string|max:3',
         ]);
 
         try {
             $categoryId = $request->category_id;
             $document_name = $request->document_name;
+            $userId = $request->user_id;
+            $statement_no = $request->statement_no;
+            $statement_period = $request->statement_period;
+            $number_of_bonds = $request->number_of_bonds;
+            $amount_subscribed = $request->amount_subscribed;
+            $currency = $request->currency;
             $category = Category::findOrFail($categoryId); // Fetch the category to get its name
             $categoryName = strtolower(str_replace(' ', '-', $category->name)); // Sanitize category name for folder (e.g., "My Category" -> "my-category")
             $files = $request->file('file');
@@ -51,9 +65,16 @@ class AdminController extends Controller
                 Files::create([
                     'name' => $file->getClientOriginalName(),
                     'path' => $path, // Path will be like "files/my-category/filename.png"
-                    'user_id' => Auth::user()->id,
+                    'user_id' => $userId,
                     'category_id' => $categoryId,
                     'document_name' => $document_name,
+                    'statement_no' => $statement_no,
+                    'statement_period' => $statement_period,
+                    'statement_period' => $statement_period,
+                    'number_of_bonds' => $number_of_bonds,
+                    'amount_subscribed' => $amount_subscribed,
+                    'currency' => $currency,
+                    'created_by' => Auth::user()->id
                 ]);
             }
             DB::commit();
@@ -160,7 +181,7 @@ class AdminController extends Controller
             'category_ids.*' => ['exists:categories,id'],
             // 'is_admin' => ['boolean']
         ]);
-        $isAdmin = ($request->has('is_admin') && $request->is_admin == true) ? 1 : 0;
+        $isAdmin = ($request->has('is_admin') && ($request->is_admin === "true" || $request->is_admin === true)) ? 1 : 0;
 
         $user = User::create([
             'name' => $request->name,
@@ -197,7 +218,8 @@ class AdminController extends Controller
     {
         $categories = Category::all();
         $files = Files::where('user_id',Auth::user()->id)->with('user', 'category')->latest()->paginate(15);
-        return view('admin.upload', compact('categories','files'));
+        $users = User::select('id', 'name')->get();
+        return view('admin.upload', compact('categories','files','users'));
     }
 
     public function manageCategories()

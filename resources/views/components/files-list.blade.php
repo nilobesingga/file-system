@@ -36,7 +36,7 @@
         <table id="filesTable" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th scope="col" class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                    <th scope="col" class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'unread', 'direction' => request('sort') === 'unread' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Read/Unread status">
                             Read | Unread
                             <span class="ml-2 sort-icon" data-column="0">
@@ -58,7 +58,7 @@
                             </span>
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'document_name', 'direction' => request('sort') === 'document_name' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Document Name">
                             Document Name
                             <span class="ml-2 sort-icon" data-column="1">
@@ -80,7 +80,31 @@
                             </span>
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'statement_no', 'direction' => request('sort') === 'statement_no' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Statement Number">
+                            Statement #
+                            <x-sort-icon column="statement_no" />
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'statement_period', 'direction' => request('sort') === 'statement_period' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Statement Period">
+                            Statement Period
+                            <x-sort-icon column="statement_period" />
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'number_of_bonds', 'direction' => request('sort') === 'number_of_bonds' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Number of Bonds">
+                            No. of Bonds
+                            <x-sort-icon column="number_of_bonds" />
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'amount_subscribed', 'direction' => request('sort') === 'amount_subscribed' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Amount">
+                            Amount
+                            <x-sort-icon column="amount_subscribed" />
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'category', 'direction' => request('sort') === 'category' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Category">
                             Category
                             <span class="ml-2 sort-icon" data-column="2">
@@ -102,7 +126,7 @@
                             </span>
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => request('sort') === 'created_at' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Upload Date">
                             Upload Date
                             <span class="ml-2 sort-icon" data-column="3">
@@ -153,6 +177,10 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->document_name ?? $file->name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->statement_no }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->statement_period ? \Carbon\Carbon::parse($file->statement_period)->format('M Y') : '-' }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ number_format($file->number_of_bonds) }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->currency }} {{ number_format($file->amount_subscribed, 2) }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100" data-category-id="{{ $file->category ? $file->category->id : '' }}">
                         {{ $file->category ? $file->category->name : 'Uncategorized' }}
                     </td>
@@ -187,7 +215,7 @@
                 </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                             <div class="flex flex-col items-center justify-center py-8">
                                 <!-- SVG Icon for Empty State -->
                                 <svg class="w-16 h-16 mb-4 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -242,7 +270,7 @@
             searchTimeout = setTimeout(() => {
                 let isAdmin = {{ Auth::check() && Auth::user()->is_admin ? 'true' : 'false' }};
                 let fileNameIndex = isAdmin ? 0 : 1;
-                let categoryIndex = isAdmin ? 1 : 2;
+                let categoryIndex = isAdmin ? 1 : 6;
 
                 // Fetch the current rows from the DOM
                 let rows = Array.from(table.getElementsByTagName("tr")).slice(1);
@@ -275,7 +303,7 @@
                     let noFilesRow = document.createElement("tr");
                     noFilesRow.id = "noFilesRow";
                     noFilesRow.innerHTML = `
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                             <div class="flex flex-col items-center justify-center py-8">
                                 <!-- SVG Icon for Empty State -->
                                 <svg class="w-16 h-16 mb-4 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

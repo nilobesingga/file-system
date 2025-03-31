@@ -7,8 +7,8 @@
             :amountInvested="$amountInvested"
             :currency="$currency"
             :numberOfBonds="$numberOfBonds"
-            :weeklyInvestments="$weeklyInvestments"
-            :weeklyBonds="$weeklyBonds"
+            :monthlyInvestments="$monthlyInvestments"
+            :monthlyBonds="$monthlyBonds"
             :labels="$labels"
             :newFiles="$newFiles"
             />

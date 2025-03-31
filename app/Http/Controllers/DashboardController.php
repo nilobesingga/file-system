@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\CategoryUser;
 use App\Models\Files;
+use Faker\Core\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-
         if (!$user) {
             return redirect()->route('login');
         }
@@ -27,7 +28,7 @@ class DashboardController extends Controller
         $sortDirection = request('direction', 'desc');
 
         // Build query for fetching files
-        $filesQuery = Files::with('user', 'category')->where('is_delete',0)->whereIn('category_id', $categoryIds);
+        $filesQuery = Files::with('user', 'category')->where('is_delete',0)->whereIn('category_id', $categoryIds)->where('files.user_id',$user->id);
 
         // Sorting logic
         if ($sortBy === 'unread') {
@@ -38,56 +39,89 @@ class DashboardController extends Controller
             ->select('files.*')
             ->orderByRaw("file_user.read_at IS NULL $sortDirection");
         } else {
-            if ($sortBy === 'document_name') {
-                $filesQuery->orderBy('document_name', $sortDirection);
-            } elseif ($sortBy === 'category') {
-                $filesQuery->join('categories', 'files.category_id', '=', 'categories.id')
-                    ->orderBy('categories.name', $sortDirection);
-            } else {
-                $filesQuery->orderBy('created_at', $sortDirection);
+            switch ($sortBy) {
+                case 'document_name':
+                case 'statement_no':
+                case 'statement_period':
+                case 'number_of_bonds':
+                case 'amount_subscribed':
+                    $filesQuery->orderBy($sortBy, $sortDirection);
+                    break;
+                case 'category':
+                    $filesQuery->join('categories', 'files.category_id', '=', 'categories.id')
+                        ->orderBy('categories.name', $sortDirection);
+                    break;
+                default:
+                    $filesQuery->orderBy('created_at', $sortDirection);
             }
         }
 
         // Paginate results
         $files = $filesQuery->paginate(15);
-        $totalFiles = Files::whereIn('category_id', $categoryIds)->where('is_delete',0)->count();
+        $totalFiles = Files::whereIn('category_id', $categoryIds)->where('user_id',$user->id)->where('is_delete',0)->count();
         $storageUsage = 0;
 
         // Count recent uploads (last 7 days)
         $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
+            ->where('user_id',$user->id)
             ->where('is_delete',0)
             ->where('created_at', '>=', now()->subDays(7))
             ->count();
 
         // Count new files uploaded today
         $newFiles = Files::whereIn('category_id', $categoryIds)
+            ->where('user_id',$user->id)
             ->where('is_delete',0)
             ->where('created_at', '>=', now()->startOfDay())
             ->count();
 
         // Get all categories
-        $category = Category::all();
+        $category = Category::whereIn('id',$categoryIds)->get();
 
         // Mock Investment Data
-        $amountInvested = 0.00;
+        $amountInvested = Files::whereIn('category_id', $categoryIds)
+            ->where('user_id',$user->id)
+            ->where('is_delete',0)
+            ->sum('amount_subscribed');
         $currency = 'USD';
-        $numberOfBonds = 0;
+        $numberOfBonds = Files::whereIn('category_id', $categoryIds)
+            ->where('user_id',$user->id)
+            ->where('is_delete',0)
+            ->sum('number_of_bonds');
 
         // Generate Monthly Investment Data
         $currentMonth = Carbon::now()->month;
-        $weeklyInvestments = array_fill(0, $currentMonth, 0);
-        $weeklyBonds = array_fill(0, $currentMonth, 0);
-
-        for ($i = 0; $i < $currentMonth; $i++) {
-            $weeklyInvestments[$i] = 0 + ($i * 0);
-            $weeklyBonds[$i] = $i * 0;
-        }
-
-        // Generate Month Labels
+        $monthlyInvestments = [];
+        $monthlyBonds = [];
         $labels = [];
-        for ($i = 0; $i < $currentMonth; $i++) {
-            $labels[] = Carbon::createFromDate(null, $i + 1, 1)->format('M Y');
+
+        // Get monthly investments from database
+        $investments = DB::table('files')
+            ->select(
+                DB::raw('MONTH(statement_period) as month'),
+                DB::raw('SUM(amount_subscribed) as total_amount'),
+                DB::raw('SUM(number_of_bonds) as total_bonds')
+            )
+            ->whereYear('statement_period', Carbon::now()->year)
+            ->whereMonth('statement_period', '<=', $currentMonth)
+            ->where('user_id', $user->id)
+            ->where('is_delete', 0)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Generate data arrays in the correct order
+        for ($i = 1; $i <= $currentMonth; $i++) {
+            $investment = $investments->firstWhere('month', $i);
+            $monthlyInvestments[] = $investment ? floatval($investment->total_amount) : 0;
+            $monthlyBonds[] = $investment ? intval($investment->total_bonds) : 0;
+            $labels[] = Carbon::createFromDate(null, $i, 1)->format('M Y');
         }
+
+        // Make sure all arrays are properly indexed
+        $monthlyInvestments = array_values($monthlyInvestments);
+        $monthlyBonds = array_values($monthlyBonds);
+        $labels = array_values($labels);
 
         return view('dashboard', compact(
             'files',
@@ -99,8 +133,8 @@ class DashboardController extends Controller
             'amountInvested',
             'currency',
             'numberOfBonds',
-            'weeklyInvestments',
-            'weeklyBonds',
+            'monthlyInvestments',
+            'monthlyBonds',
             'labels'
         ));
     }

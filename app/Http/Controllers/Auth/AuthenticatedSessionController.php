@@ -29,6 +29,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         $user = Auth::user();
 
+        // Check if user is required to change password
+        // if ($user && !$user->force_password_change && !$user->is_admin) {
+        //     return redirect()->route('change-password');
+        // }
         // Check if user is authenticated and has 2FA enabled but not verified
         if ($user && $user->two_factor_secret && !$request->session()->has('two_factor_verified')) {
             return redirect()->route('two-factor.challenge');

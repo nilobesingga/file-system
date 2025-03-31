@@ -15,18 +15,23 @@
     <!-- Alpine.js Global State for Theme Color -->
     <div x-data="{
             themeColor: localStorage.getItem('themeColor') || 'bg-gray-800',
+            sidebarOpen: localStorage.getItem('sidebarOpen') === 'true' || false,
             setTheme(color) {
                 this.themeColor = color;
                 localStorage.setItem('themeColor', color);
+            },
+            toggleSidebar() {
+                this.sidebarOpen = !this.sidebarOpen;
+                localStorage.setItem('sidebarOpen', this.sidebarOpen);
             }
         }"
         x-init="themeColor = localStorage.getItem('themeColor') || 'bg-gray-700'"
-        class="flex flex-col min-h-screen ">
+        class="flex flex-col min-h-screen">
 
         @if(Auth::check() && Auth::user()->is_admin)
             <!-- Sidebar -->
-            <div class="fixed inset-y-0 left-0 z-40 w-64 text-white transition-all duration-300 shadow-xl rounded-r-3xl "
-                 :class="themeColor">
+            <div class="fixed inset-y-0 left-0 z-40 w-64 text-white transition-all duration-300 transform shadow-xl rounded-r-3xl"
+                 :class="[themeColor, !sidebarOpen ? '-translate-x-full' : '']">
 
                 <div class="flex flex-col h-full">
                     <!-- Sidebar Header -->
@@ -103,13 +108,23 @@
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1">
-            <!-- Navigation Bar (Syncs with Sidebar) -->
+            <!-- Navigation Bar -->
             @if(Auth::check() && Auth::user()->is_admin)
                 <nav class="transition-all duration-300 bg-white border-b-4 border-yellow-900 dark:bg-white dark:text-dark dark:border-yellow-700"
                     :class="themeColor">
                     <div class="{{ Auth::check() && Auth::user()->is_admin ? 'w-full' : 'max-w-7xl' }} px-2 mx-auto sm:px-6 lg:px-8">
                         <div class="flex justify-between h-16">
-                            <div class="flex">
+                            <div class="flex items-center">
+                                <!-- Hamburger Toggle Button -->
+                                <button @click="toggleSidebar"
+                                        :class="sidebarOpen ? 'ml-60' : 'ml-0'"
+                                        class="p-2 mr-2 text-red-500 rounded-md hover:text-gray-600 focus:outline-none">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 6h16M4 12h16m-7 6h7"/>
+                                    </svg>
+                                </button>
+
                                 <div class="flex items-center shrink-0">
                                     <a href="{{ route('dashboard') }}" class="flex items-center">
                                         <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Laravel') }}" class="w-auto h-8">
@@ -158,7 +173,8 @@
                 </header>
             @endisset
 
-            <main class="flex-1 py-4 p-6 transition-all duration-300 {{ Auth::check() && Auth::user()->is_admin ? 'ml-64' : '' }}">
+            <main class="flex-1 p-6 py-4 transition-all duration-300"
+                  :class="sidebarOpen ? 'ml-64' : ''">
                 {{ $slot }}
             </main>
             @include('layouts.footer')

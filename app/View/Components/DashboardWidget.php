@@ -10,8 +10,8 @@ class DashboardWidget extends Component
     public $amountInvested;
     public $currency;
     public $numberOfBonds;
-    public $weeklyInvestments;
-    public $weeklyBonds;
+    public $monthlyInvestments;
+    public $monthlyBonds;
     public $labels;
     public $recentUploadsCount;
     public $newFiles;
@@ -21,8 +21,8 @@ class DashboardWidget extends Component
         $currency,
         $numberOfBonds,
         $totalFiles,
-        $weeklyInvestments,
-        $weeklyBonds,
+        $monthlyBonds,
+        $monthlyInvestments,
         $labels,
         $recentUploadsCount,
         $newFiles
@@ -31,8 +31,8 @@ class DashboardWidget extends Component
         $this->amountInvested = $amountInvested;
         $this->currency = $currency;
         $this->numberOfBonds = $numberOfBonds;
-        $this->weeklyInvestments = $weeklyInvestments;
-        $this->weeklyBonds = $weeklyBonds;
+        $this->monthlyInvestments = $monthlyInvestments;
+        $this->monthlyBonds = $monthlyBonds;
         $this->labels = $labels;
         $this->recentUploadsCount = $recentUploadsCount;
         $this->newFiles = $newFiles;
