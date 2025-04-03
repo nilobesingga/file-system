@@ -1,30 +1,30 @@
 <x-app-layout>
     {{-- <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             Upload Files
         </h2>
     </x-slot> --}}
 
     <div class="py-3">
-        <div class="w-full mx-auto sm:px-6 lg:px-8">
+        <div class="w-full mx-auto sm:px-6 lg:px-20">
             @if (session('success'))
-                <div class="mb-4 text-sm text-green-600 dark:text-green-400">
+                <div class="mb-4 text-sm text-green-600">
                     {{ session('success') }}
                 </div>
             @endif
-            <div class="p-6 mb-2 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-                <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Upload Files</h3>
+            <div class="p-7 mb-4 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <h3 class="mb-4 text-2xl font-semibold text-gray-900">Upload Files</h3>
                 <form action="{{ route('admin.upload') }}" method="POST" enctype="multipart/form-data" id="dropzoneForm" class="space-y-4">
                     @csrf
                     <div class="flex flex-row gap-2 mt-4">
                         <div class="sm:w-1/2">
-                            <x-input-label for="user_id" class="mb-2 dark:text-white" :value="__('Select Investor *')" required />
+                            <x-input-label for="user_id" class="mb-2" :value="__('Select Investor *')" required />
                             <x-user-multi-select required/>
                             <x-input-error :messages="$errors->get('user_id')" class="mt-2" id="user_id_error" />
                         </div>
                         <div class="sm:w-1/2">
-                            <x-input-label for="category_ids" class="dark:text-white" :value="__('Categories *')" />
-                            <select name="category_id" id="category_id" data-choice class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-dark focus:outline-none dark:bg-white dark:border-gray-600 dark:placeholder-gray-400" required>
+                            <x-input-label for="category_ids" class="" :value="__('Categories *')" />
+                            <select name="category_id" id="category_id" data-choice class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm" required>
                                 <option value="">Select Category</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -36,63 +36,63 @@
                     <!-- Document Name Input Field -->
                     <div class="flex flex-row gap-2 mt-4">
                         <div class="sm:w-1/2">
-                            <x-input-label for="document_name" class="dark:text-white" :value="__('Bond Name *')" />
+                            <x-input-label for="document_name" class="" :value="__('Bond Name *')" />
                             <x-text-input
                                 id="document_name"
                                 name="document_name"
                                 type="text"
-                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:text-dark focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-dark"
+                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none"
                                 placeholder="Enter bond name"
                                 required
                             />
                             <x-input-error :messages="$errors->get('document_name')" class="mt-2" id="document_name_error" />
                         </div>
                         <div class="sm:w-1/2">
-                            <x-input-label for="statement_no" class="dark:text-white" :value="__('Statement # *')" />
+                            <x-input-label for="statement_no" class="" :value="__('Statement # *')" />
                             <x-text-input
                                 id="statement_no"
                                 name="statement_no"
                                 type="text"
-                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:text-dark focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-dark"
+                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none"
                                 placeholder="Enter statement number"
                                 required
                             />
                             <x-input-error :messages="$errors->get('statement_no')" class="mt-2" id="statement_no_error" />
                         </div>
                         <div class="sm:w-1/2">
-                            <x-input-label for="statement_period" class="dark:text-white" :value="__('Statement Period *')" />
-                            <input type="date" id="statement_period" name="statement_period" class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:text-dark focus:outline-none dark:bg-white dark:border-gray-600 dark:placeholder-gray-400" required>
+                            <x-input-label for="statement_period" class="" :value="__('Statement Period *')" />
+                            <input type="date" id="statement_period" name="statement_period" class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm" required>
                             <x-input-error :messages="$errors->get('statement_period')" class="mt-2" id="statement_period_error" />
                         </div>
                     </div>
                     <div class="flex flex-row gap-2 mt-4">
                         <div class="sm:w-1/2">
-                            <x-input-label for="number_of_bonds" class="dark:text-white" :value="__('Number of Bonds *')" />
+                            <x-input-label for="number_of_bonds" class="" :value="__('Number of Bonds *')" />
                             <x-text-input
                                 id="number_of_bonds"
                                 name="number_of_bonds"
                                 type="text"
-                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:text-dark focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-dark"
+                                class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm"
                                 placeholder="Enter number of bonds"
                                 required
                             />
                             <x-input-error :messages="$errors->get('number_of_bonds')" class="mt-2" id="number_of_bonds_error" />
                         </div>
                         <div class="sm:w-1/2">
-                            <x-input-label for="amount_subscribed" class="dark:text-white" :value="__('Amount Subscribed *')" />
+                            <x-input-label for="amount_subscribed" class="" :value="__('Amount Subscribed *')" />
                             <x-text-input
                                 id="amount_subscribed"
                                 name="amount_subscribed"
                                 type="text"
-                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:text-dark focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-dark"
+                                class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none"
                                 placeholder="0.00"
                                 required
                             />
                             <x-input-error :messages="$errors->get('amount_subscribed')" class="mt-2" id="amount_subscribed_error" />
                         </div>
                         <div class="sm:w-1/2">
-                            <x-input-label for="currency" class="dark:text-white" :value="__('Currency *')" />
-                            <select name="currency" id="currency" data-choice class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-dark focus:outline-none dark:bg-white dark:border-gray-600 dark:placeholder-gray-400" required>
+                            <x-input-label for="currency" class="" :value="__('Currency *')" />
+                            <select name="currency" id="currency" data-choice class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm" required>
                                 <option value="">Select Currency</option>
                                 <option value="USD" selected>USD</option>
                                 <option value="AED">AED</option>
@@ -100,27 +100,27 @@
                             <x-input-error :messages="$errors->get('currency')" class="mt-2" />
                         </div>
                     </div>
-                    <x-input-label for="category_ids" class="dark:text-white" :value="__('Attach Documents')" />
-                    <div class="p-4 transition border-2 border-yellow-800 border-dashed rounded-lg dropzone dark:border-yellow-900 hover:border-yellow-600 dark:hover:border-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-700" id="dropzoneUpload">
+                    <x-input-label for="category_ids" class="" :value="__('Attach Documents')" />
+                    <div class="p-4 transition border-2 border-yellow-800 border-dashed rounded-lg dropzone hover:border-yellow-600 hover:bg-yellow-100" id="dropzoneUpload">
                         <div class="flex flex-col items-center justify-center p-2 text-center dz-message needsclick">
                             <!-- Upload Icon -->
-                            <svg class="w-12 h-12 mb-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <svg class="w-12 h-12 mb-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                             </svg>
 
                             <!-- Dropzone Text -->
-                            <p class="text-gray-600 dark:text-gray-300">Drag and drop files here, or click to select files</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Any file type allowed (max 10MB each)</p>
+                            <p class="text-gray-600">Drag and drop files here, or click to select files</p>
+                            <p class="text-sm text-gray-500">Any file type allowed (max 10MB each)</p>
                         </div>
                     </div>
-                    <button type="submit" id="submitDropzone" class="inline-flex items-center hidden px-4 py-2 text-white rounded-md bg-customBlue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <button type="submit" id="submitDropzone" class="inline-flex items-center hidden px-4 py-2 text-white rounded-md bg-customBlue hover:bg-customBlue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bg-customBlue/90">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                         </svg>
 
                         Upload Files
                     </button>
-                    <div id="dropzoneErrors" class="hidden mt-2 text-sm text-red-600 dark:text-red-400"></div>
+                    <div id="dropzoneErrors" class="hidden mt-2 text-sm text-red-600"></div>
                 </form>
             </div>
             <x-files-list :files="$files" :category="$categories"/>
