@@ -16,7 +16,8 @@ export default {
             },
             colors: {
                 customBlue: '#22518E',
-                customGreen: '#11CABE'
+                customGreen: '#11CABE',
+                'capLionGold': '#A57D2D',
             },
         },
     },

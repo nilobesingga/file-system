@@ -1,12 +1,12 @@
-<div class="p-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+<div class="px-7 py-6 overflow-hidden bg-white shadow-sm sm:rounded-lg">
     <!-- Search Bar with Loading Indicator -->
     <div class="relative flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Files</h3>
+        <h3 class="text-xl font-bold text-gray-900">Files</h3>
 
         <div class="flex items-center space-x-4">
             <!-- Category Filter Dropdown -->
             <div>
-                <select id="categoryFilter" onchange="filterTableByCategory()" class="px-4 py-2 text-gray-900 border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-100 focus:outline-none">
+                <select id="categoryFilter" onchange="filterTableByCategory()" class="px-4 py-2 text-gray-700 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm">
                     <option value="">All Categories</option>
                     @foreach($category as $cat)
                         <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -18,11 +18,11 @@
             <div class="relative">
                 <input type="text" id="searchInput" onkeyup="searchTable()"
                        placeholder="Search files..."
-                       class="px-4 py-2 text-gray-900 border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                       class="px-4 py-2 text-gray-700 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm">
 
                 <!-- Loading Spinner -->
                 <div id="loadingSpinner" class="absolute hidden transform -translate-y-1/2 right-3 top-1/2">
-                    <svg class="w-5 h-5 text-blue-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-sky-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0"></path>
                     </svg>
@@ -33,12 +33,12 @@
 
     <!-- Uploaded Files Table -->
     <div class="overflow-x-auto">
-        <table id="filesTable" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
+        <table id="filesTable" class="min-w-full divide-y divide-gray-300">
+            <thead>
                 <tr>
-                    <th scope="col" class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'unread', 'direction' => request('sort') === 'unread' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Read/Unread status">
-                            Read | Unread
+                            Read / Unread
                             <span class="ml-2 sort-icon" data-column="0">
                                 @if(request('sort') === 'unread')
                                     @if(request('direction') === 'asc')
@@ -58,7 +58,7 @@
                             </span>
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap ">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'document_name', 'direction' => request('sort') === 'document_name' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Document Name">
                             Document Name
                             <span class="ml-2 sort-icon" data-column="1">
@@ -80,31 +80,31 @@
                             </span>
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'statement_no', 'direction' => request('sort') === 'statement_no' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Statement Number">
                             Statement #
                             <x-sort-icon column="statement_no" />
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'statement_period', 'direction' => request('sort') === 'statement_period' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Statement Period">
                             Statement Period
                             <x-sort-icon column="statement_period" />
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'number_of_bonds', 'direction' => request('sort') === 'number_of_bonds' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Number of Bonds">
                             No. of Bonds
                             <x-sort-icon column="number_of_bonds" />
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'amount_subscribed', 'direction' => request('sort') === 'amount_subscribed' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Amount">
                             Amount
                             <x-sort-icon column="amount_subscribed" />
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'category', 'direction' => request('sort') === 'category' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Category">
                             Category
                             <span class="ml-2 sort-icon" data-column="2">
@@ -126,7 +126,7 @@
                             </span>
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => request('sort') === 'created_at' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Upload Date">
                             Upload Date
                             <span class="ml-2 sort-icon" data-column="3">
@@ -148,14 +148,14 @@
                             </span>
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                         Actions
                     </th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+            <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($files as $file)
-                <tr class="{{ $file->isReadByCurrentUser() ? '' : 'bg-yellow-50 dark:bg-yellow-900/30 font-bold' }} hover:bg-gray-100 dark:hover:bg-gray-700" onclick="toggleReadStatus({{ $file->id }})" style="cursor: pointer;">
+                <tr class="{{ $file->isReadByCurrentUser() ? '' : 'bg-sky-100/50' }} hover:bg-gray-50" onclick="toggleReadStatus({{ $file->id }})" style="cursor: pointer;">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center space-x-2">
                             <!-- Hidden Checkbox (for sorting purposes) -->
@@ -168,37 +168,36 @@
                             <span class="read-icon" data-file-id="{{ $file->id }}" aria-label="{{ $file->isReadByCurrentUser() ? 'File read' : 'File unread' }}">
                                 @if($file->isReadByCurrentUser())
                                     <!-- Open Envelope (Read) -->
-                                    <i class="text-gray-500 fas fa-envelope-open dark:text-gray-400"></i>
+                                    <i class="text-gray-500 fas fa-envelope-open"></i>
                                 @else
                                     <!-- Closed Envelope (Unread) -->
-                                    <i class="text-gray-800 fas fa-envelope dark:text-gray-300"></i>
+                                    <i class="text-gray-800 fas fa-envelope"></i>
                                 @endif
                             </span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->document_name ?? $file->name }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->statement_no }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->statement_period ? \Carbon\Carbon::parse($file->statement_period)->format('M Y') : '-' }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ number_format($file->number_of_bonds) }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">{{ $file->currency }} {{ number_format($file->amount_subscribed, 2) }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100" data-category-id="{{ $file->category ? $file->category->id : '' }}">
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->document_name ?? $file->name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->statement_no }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->statement_period ? \Carbon\Carbon::parse($file->statement_period)->format('M Y') : '-' }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ number_format($file->number_of_bonds) }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->currency }} {{ number_format($file->amount_subscribed, 2) }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap" data-category-id="{{ $file->category ? $file->category->id : '' }}">
                         {{ $file->category ? $file->category->name : 'Uncategorized' }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap dark:text-gray-300" data-upload-date="{{ $file->created_at->format('Y-m-d H:i:s') }}">
+                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap" data-upload-date="{{ $file->created_at->format('Y-m-d H:i:s') }}">
                         {{ $file->created_at->format('F d, Y h:i A') }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap dark:text-gray-300">
+                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                         <div class="flex space-x-2">
                             <!-- Preview Button -->
                             <button onclick="event.stopPropagation(); previewFile('{{ asset('storage/' . $file->path) }}', '{{ Storage::mimeType($file->path) }}', {{ $file->id }})"
-                                    class="inline-flex items-center px-3 py-1 text-sm text-white rounded-md bg-customBlue hover:bg-customBlue">
-
+                                    class="inline-flex items-center px-3 py-1.5 text-sm text-white rounded-md bg-customBlue hover:bg-customBlue/90 transition-all duration-200">
                                 Preview
                             </button>
                             <!-- Download Button -->
                             <a href="{{ route('file.download', $file) }}"
                                onclick="event.stopPropagation(); markAsRead({{ $file->id }})"
-                               class="inline-flex items-center px-3 py-1 text-sm text-white rounded-md bg-customGreen hover:bg-customGreen">
+                               class="inline-flex items-center px-3 py-1.5 text-sm text-white rounded-md bg-customGreen hover:bg-customGreen/90 transition-all duration-200">
                                 Download
                             </a>
                             @if(Auth::check() && Auth::user()->is_admin && Route::currentRouteName() !== 'dashboard')
@@ -215,13 +214,13 @@
                 </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                            <div class="flex flex-col items-center justify-center py-8">
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">
+                            <div class="flex flex-col items-center justify-center py-52">
                                 <!-- SVG Icon for Empty State -->
-                                <svg class="w-16 h-16 mb-4 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg class="w-16 h-16 mb-2 text-gray-300 " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                                 </svg>
-                                <p class="text-sm text-red-400 dark:text-red-500">No files found.</p>
+                                <p class="text-sm text-gray-400 ">No files found.</p>
                             </div>
                         </td>
                     </tr>
@@ -235,20 +234,15 @@
 </div>
 
 <!-- File Preview Modal -->
-<div id="filePreviewModal" class="fixed inset-0 flex items-center justify-center hidden bg-gray-600 bg-opacity-50">
-    <div class="relative w-3/4 max-w-4xl p-6 overflow-auto bg-white rounded-lg shadow-lg dark:bg-gray-800">
-        <h3 id="modalTitle" class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">File Preview</h3>
-        <button onclick="closePreview()" class="absolute p-2 text-gray-500 rounded-full top-4 right-4 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+<div id="filePreviewModal" class="fixed inset-0 flex items-center justify-center hidden bg-sky-950/90 backdrop-blur-sm">
+    <div class="relative w-3/4 max-w-4xl p-8 overflow-auto bg-white rounded-lg shadow-lg">
+        <h3 id="modalTitle" class="mb-4 text-2xl font-semibold text-gray-900">File Preview</h3>
+        <button onclick="closePreview()" class="absolute p-2 text-gray-500 rounded-full top-4 right-4 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
         <div id="fileViewer" class="w-full h-[500px] overflow-auto"></div>
-        <div class="flex justify-end mt-4">
-            <button onclick="closePreview()" class="inline-flex items-center px-4 py-2 text-gray-800 transition-all duration-200 bg-gray-200 rounded-md dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                Close
-            </button>
-        </div>
     </div>
 </div>
 
@@ -303,13 +297,13 @@
                     let noFilesRow = document.createElement("tr");
                     noFilesRow.id = "noFilesRow";
                     noFilesRow.innerHTML = `
-                        <td colspan="9" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center py-8">
                                 <!-- SVG Icon for Empty State -->
-                                <svg class="w-16 h-16 mb-4 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg class="w-16 h-16 mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                                 </svg>
-                                <p class="text-sm text-red-400 dark:text-red-500">No files found.</p>
+                                <p class="text-sm text-red-400">No files found.</p>
                             </div>
                         </td>
                     `;
@@ -388,9 +382,7 @@
             if (data.success) {
                 const row = checkbox.closest('tr');
                 if (row) {
-                    row.classList.toggle('bg-yellow-50', !data.read);
-                    row.classList.toggle('dark:bg-yellow-900/30', !data.read);
-                    row.classList.toggle('font-bold', !data.read);
+                    row.classList.toggle('bg-sky-50', !data.read);
                 } else {
                     console.error(`Row for fileId ${fileId} not found`);
                 }
@@ -398,8 +390,8 @@
                 const iconSpan = document.querySelector(`span.read-icon[data-file-id="${fileId}"]`);
                 if (iconSpan) {
                     iconSpan.innerHTML = data.read
-                        ? `<i class="text-gray-500 fas fa-envelope-open dark:text-gray-400"></i>`
-                        : `<i class="text-gray-800 fas fa-envelope dark:text-gray-300"></i>`;
+                        ? `<i class="text-gray-500 fas fa-envelope-open"></i>`
+                        : `<i class="text-gray-800 fas fa-envelope"></i>`;
                     iconSpan.setAttribute('aria-label', data.read ? 'File read' : 'File unread');
                 } else {
                     console.error(`Icon span for fileId ${fileId} not found`);
@@ -432,16 +424,14 @@
                     checkbox.checked = true;
                     const row = checkbox.closest('tr');
                     if (row) {
-                        row.classList.remove('bg-yellow-50');
-                        row.classList.remove('dark:bg-yellow-900/30');
-                        row.classList.remove('font-bold');
+                        row.classList.remove('bg-sky-50');
                     } else {
                         console.error(`Row for fileId ${fileId} not found`);
                     }
 
                     const iconSpan = document.querySelector(`span.read-icon[data-file-id="${fileId}"]`);
                     if (iconSpan) {
-                        iconSpan.innerHTML = `<i class="text-gray-500 fas fa-envelope-open dark:text-gray-400"></i>`;
+                        iconSpan.innerHTML = `<i class="text-gray-500 fas fa-envelope-open"></i>`;
                         iconSpan.setAttribute('aria-label', 'File read');
                     } else {
                         console.error(`Icon span for fileId ${fileId} not found`);
