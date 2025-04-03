@@ -44,6 +44,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_admin' => 'boolean',
+        'show_welcome_modal' => 'boolean',
         'force_password_change' => 'boolean'
     ];
 
