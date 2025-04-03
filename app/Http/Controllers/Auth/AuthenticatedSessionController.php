@@ -42,6 +42,11 @@ class AuthenticatedSessionController extends Controller
             // User is an admin, redirect to admin dashboard
             return redirect()->intended(route('admin.dashboard'));
         }
+
+        if (!Auth::user()->is_admin && Auth::user()->show_welcome_modal) {
+            session(['show_welcome_modal' => true]);
+        }
+
         return redirect()->intended(route('dashboard'));
     }
 
