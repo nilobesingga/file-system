@@ -46,10 +46,13 @@ class FileHelper
      */
     public static function getNotication()
     {
-        $unreadFilesCount = Files::where('is_delete', 0)->where('user_id', Auth::id())->whereDoesntHave('readers', function ($query) {
+        $unreadFilesCount = Files::where('is_delete', 0)->whereDoesntHave('readers', function ($query) {
             $query->where('user_id', Auth::id());
-        })->count();
-        return $unreadFilesCount;
+        });
+        if (!Auth::user()->is_admin) {
+            $unreadFilesCount->where('user_id', Auth::id());
+        }
+        return $unreadFilesCount->count();
     }
 
     /**
@@ -57,9 +60,14 @@ class FileHelper
      */
     public static function getUnreadFiles()
     {
-        return Files::where('is_delete', 0)->where('user_id', Auth::id())->whereDoesntHave('readers', function ($query) {
+        $query = Files::where('is_delete', 0)->whereDoesntHave('readers', function ($query) {
             $query->where('user_id', Auth::id());
-        })->get();
+        });
+
+        if (!Auth::user()->is_admin) {
+            $query->where('files.user_id', Auth::id());
+        }
+        return $query->get();
     }
 
     /**

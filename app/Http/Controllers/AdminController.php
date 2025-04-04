@@ -24,9 +24,9 @@ class AdminController extends Controller
         $users = User::all();
 
         $totalFiles = $files->count();
-        $storageUsage = \App\Helpers\FileHelper::getTotalSize();
+        $unreadFilesCount = \App\Helpers\FileHelper::getNotication();
         $recentUploadsCount = Files::where('created_by',Auth::user()->id)->where('created_at', '>=', now()->subDays(7))->count();
-        return view('admin.dashboard', compact('files', 'categories', 'users', 'totalFiles', 'storageUsage', 'recentUploadsCount'));
+        return view('admin.dashboard', compact('files', 'categories', 'users', 'totalFiles', 'unreadFilesCount', 'recentUploadsCount'));
     }
 
     public function upload(Request $request)
@@ -217,7 +217,7 @@ class AdminController extends Controller
     public function showUpload()
     {
         $categories = Category::all();
-        $files = Files::where('user_id',Auth::user()->id)->with('user', 'category')->latest()->paginate(15);
+        $files = Files::where('created_by',Auth::user()->id)->with('user', 'category')->latest()->paginate(15);
         $users = User::select('id', 'name')->get();
         return view('admin.upload', compact('categories','files','users'));
     }
