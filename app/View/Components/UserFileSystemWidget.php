@@ -6,16 +6,16 @@ use Illuminate\View\Component;
 class UserFileSystemWidget extends Component
 {
     public $totalFiles;
-    public $storageUsage;
+    public $unreadFilesCount;
     public $recentUploadsCount;
 
     /**
      * Create a new component instance.
      */
-    public function __construct($totalFiles = 0, $storageUsage = "", $recentUploadsCount = 0)
+    public function __construct($totalFiles = 0, $unreadFilesCount = 0, $recentUploadsCount = 0)
     {
         $this->totalFiles = $totalFiles;
-        $this->storageUsage = $storageUsage;
+        $this->unreadFilesCount = $unreadFilesCount;
         $this->recentUploadsCount = $recentUploadsCount;
     }
 
