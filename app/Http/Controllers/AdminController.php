@@ -217,7 +217,7 @@ class AdminController extends Controller
     public function showUpload()
     {
         $categories = Category::all();
-        $files = Files::where('created_by',Auth::user()->id)->with('user', 'category')->latest()->paginate(15);
+        $files = Files::where('created_by',Auth::user()->id)->where('is_delete',0)->with('user', 'category')->latest()->paginate(15);
         $users = User::select('id', 'name')->get();
         return view('admin.upload', compact('categories','files','users'));
     }
