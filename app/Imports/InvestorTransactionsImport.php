@@ -51,27 +51,27 @@ class InvestorTransactionsImport implements ToModel, WithHeadingRow
     }
 
     private function parseDate($value, $use1904System = false)
-{
-    if (is_null($value) || $value === '') {
-        return now()->toDateString();
-    }
+    {
+        if (is_null($value) || $value === '') {
+            return now()->toDateString();
+        }
 
-    if (is_numeric($value)) {
+        if (is_numeric($value)) {
+            try {
+                $baseDate = $use1904System
+                    ? \Carbon\Carbon::create(1903, 12, 31) // 1904 system
+                    : \Carbon\Carbon::create(1899, 12, 31); // 1900 system
+                $days = $use1904System ? (int)$value + 1462 : (int)$value;
+                return $baseDate->addDays($days)->toDateString();
+            } catch (\Exception $e) {
+                return now()->toDateString();
+            }
+        }
+
         try {
-            $baseDate = $use1904System
-                ? \Carbon\Carbon::create(1903, 12, 31) // 1904 system
-                : \Carbon\Carbon::create(1899, 12, 31); // 1900 system
-            $days = $use1904System ? (int)$value + 1462 : (int)$value;
-            return $baseDate->addDays($days)->toDateString();
+            return \Carbon\Carbon::createFromFormat('Y/m/d', $value)->toDateString();
         } catch (\Exception $e) {
             return now()->toDateString();
         }
     }
-
-    try {
-        return \Carbon\Carbon::createFromFormat('Y/m/d', $value)->toDateString();
-    } catch (\Exception $e) {
-        return now()->toDateString();
-    }
-}
 }
