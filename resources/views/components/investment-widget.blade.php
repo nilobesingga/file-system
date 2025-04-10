@@ -2,16 +2,16 @@
     <h3 class="mb-4 text-lg font-semibold text-gray-900">Investment Overview</h3>
 
     <!-- Charts Container -->
-    <div class="flex flex-col gap-6 md:flex-row">
+    <div class="flex flex-col md:flex-row">
         <!-- Left Chart: Investor's Assets, Monthly Net Gain/Loss, Monthly Net Performance -->
-        <div class="w-full md:w-1/2 h-[300px]">
+        <div class="w-full h-[320px]">
             <canvas id="performanceChart-{{ $investorCode }}"></canvas>
         </div>
 
         <!-- Right Chart: Number of Bonds -->
-        <div class="w-full md:w-1/2 h-[300px]">
+        {{-- <div class="w-full md:w-1/2 h-[300px]">
             <canvas id="bondsChart-{{ $investorCode }}"></canvas>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Chart.js and chartjs-plugin-datalabels -->
@@ -30,22 +30,22 @@
                     labels: @json($statistics->pluck('month')),
                     datasets: [
                         {
-                            label: 'Monthly Net Performance (%)',
+                            label: 'Return',
                             type: 'line',
                             data: @json($statistics->pluck('monthly_net_percentage')),
                             borderColor: 'rgba(6, 100, 1, 1)',
                             yAxisID: 'y1',
                         },
                         {
-                            label: "Investor's Assets ($)",
+                            label: "Investor Assets",
                             data: @json($statistics->pluck('investor_assets')),
-                            backgroundColor: 'rgba(226, 126, 25)',
+                            backgroundColor: 'rgb(34, 81, 142)',
                             yAxisID: 'y',
                         },
                         {
-                            label: 'Monthly Net Gain/Loss ($)',
+                            label: 'Profit / Loss',
                             data: @json($statistics->pluck('monthly_net_gain_loss')),
-                            backgroundColor: 'rgb(34, 81, 142)',
+                            backgroundColor: 'rgba(226, 126, 25)',
                             yAxisID: 'y',
                         },
                     ],
@@ -88,18 +88,21 @@
                         },
                         datalabels: {
                             anchor: 'end',
-                            align: 'right',
+                            align: 'top',
                             offset: 5, // Add some space between the bar/line and the label
                             formatter: (value, context) => {
-                                if (context.dataset.label === "Investor's Assets ($)") {
+                                if (context.dataset.label === "Investor Assets") {
                                     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-                                } else if (context.dataset.label === 'Monthly Net Gain/Loss ($)') {
+                                } else if (context.dataset.label === 'Profit / Loss') {
                                     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                                 } else {
                                     return value + '%'; // Format percentage with 2 decimals
                                 }
                             },
-                            color: '#000',
+                            color: (context) => {
+                                const value = context.dataset.data[context.dataIndex];
+                                return value < 0 ? '#ff0000' : '#000'; // Red if negative, black otherwise
+                            },
                             font: {
                                 weight: 'bold',
                                 size: 12,
@@ -110,53 +113,53 @@
             });
 
             // Bonds Chart (Right)
-            const bondsCtx = document.getElementById('bondsChart-{{ $investorCode }}').getContext('2d');
-            new Chart(bondsCtx, {
-                type: 'bar',
-                data: {
-                    labels: @json($statistics->pluck('month')),
-                    datasets: [{
-                        label: 'Number of Bonds',
-                        data: @json($statistics->pluck('number_of_bonds')),
-                        backgroundColor: 'rgb(34, 81, 142)',
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Bonds',
-                            },
-                        },
-                        x: {
-                            title: {
-                                display: false,
-                                text: 'Month',
-                            },
-                        },
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        },
-                        datalabels: {
-                            anchor: 'center',
-                            align: 'top',
-                            offset: 5, // Add some space between the bar and the label
-                            formatter: (value) => value, // Display the raw number
-                            color: '#fff',
-                            font: {
-                                weight: 'bold',
-                                size: 12,
-                            },
-                        },
-                    },
-                },
-            });
+            // const bondsCtx = document.getElementById('bondsChart-{{ $investorCode }}').getContext('2d');
+            // new Chart(bondsCtx, {
+            //     type: 'bar',
+            //     data: {
+            //         labels: @json($statistics->pluck('month')),
+            //         datasets: [{
+            //             label: 'Number of Bonds',
+            //             data: @json($statistics->pluck('number_of_bonds')),
+            //             backgroundColor: 'rgb(34, 81, 142)',
+            //         }],
+            //     },
+            //     options: {
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //         scales: {
+            //             y: {
+            //                 beginAtZero: true,
+            //                 title: {
+            //                     display: true,
+            //                     text: 'Number of Bonds',
+            //                 },
+            //             },
+            //             x: {
+            //                 title: {
+            //                     display: false,
+            //                     text: 'Month',
+            //                 },
+            //             },
+            //         },
+            //         plugins: {
+            //             legend: {
+            //                 position: 'bottom',
+            //             },
+            //             datalabels: {
+            //                 anchor: 'center',
+            //                 align: 'top',
+            //                 offset: 5, // Add some space between the bar and the label
+            //                 formatter: (value) => value, // Display the raw number
+            //                 color: '#fff',
+            //                 font: {
+            //                     weight: 'bold',
+            //                     size: 12,
+            //                 },
+            //             },
+            //         },
+            //     },
+            // });
         });
     </script>
 </div>

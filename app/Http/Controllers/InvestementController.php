@@ -32,6 +32,7 @@ class InvestementController extends Controller
             // Import the file into investor_transactions
             $file = $request->file('file');
             $fileData = FacadesExcel::toArray(new \App\Imports\InvestorTransactionsImport, $file);
+
             $folderPath = 'investor/investment/' . Auth::user()->id . '/';
             $file->store($folderPath, 'public');
 
@@ -53,14 +54,10 @@ class InvestementController extends Controller
                 $transactionType = $row['transaction_type'] ?? null;
                 $month = $row['month'] ?? null;
                 $year = $row['year'] ?? null;
-                $year = $row['year'] ?? null;
-                $year = $row['year'] ?? null;
-                $year = $row['year'] ?? null;
-                $year = $row['year'] ?? null;
                 $bond_series = $row['bond_serie'] ?? null;
                 $amount = $row['amount'] ?? null;
                 $investor_name = $row['investor_name'] ?? null;
-                $date = $row['date'] ?? null;
+                $date = $this->parseDate($row['date']) ?? null;
                 $transaction = $row['transaction'] ?? null;
 
                 // Skip if any required field is missing
@@ -71,7 +68,7 @@ class InvestementController extends Controller
                 // Check if a record with these values already exists
                 $exists = Investment::where('investor_code', $investorCode)
                     ->where('investor_subaccount', $investorSubaccount)
-                    ->where('monthly_distribution', $monthlyDistribution)
+                    ->where('monthly_distribution', $this->parseMonthlyDistribution($monthlyDistribution))
                     ->where('transaction_type', $transactionType)
                     ->where('month', $month)
                     ->where('year', $year)
@@ -193,55 +190,85 @@ class InvestementController extends Controller
 
     public function confirmOverwrite(Request $request)
     {
-    // Check if the user confirmed the overwrite
-    if ($request->input('overwrite') !== '1') {
-        return redirect()->route('admin.investments.upload')->with('error', 'Upload cancelled.');
+        // Check if the user confirmed the overwrite
+        if ($request->input('overwrite') !== '1') {
+            return redirect()->route('admin.investments.upload')->with('error', 'Upload cancelled.');
+        }
+
+        try {
+            // Retrieve the file path from the session
+            $filePath = $request->session()->get('pending_upload_file');
+            $investorCodes = $request->session()->get('investor_codes', []);
+            // Check if the file exists
+            if (!$filePath || !Storage::exists($filePath)) {
+                return redirect()->route('admin.investments.upload')->with('error', 'Uploaded file not found. Please upload again.');
+            }
+            // Load the file data again to get the records to delete
+            $fileData = FacadesExcel::toArray(new \App\Imports\InvestorTransactionsImport, $filePath);
+            $sheetData = $fileData[0];
+            // Delete existing records
+            foreach ($sheetData as $row) {
+                $investorCode = $row['investor_code'] ?? null;
+                $investorSubaccount = $row['investor_subaccount'] ?? $row['investor_sub_account'] ?? null;
+                $monthlyDistribution = $row['monthly_distribution'] ?? null;
+                $transactionType = $row['transaction_type'] ?? null;
+                $month = $row['month'] ?? null;
+                $year = $row['year'] ?? null;
+
+                if ($investorCode && $investorSubaccount && $transactionType && $month && $year) {
+                    Investment::where('investor_code', $investorCode)
+                        ->where('investor_subaccount', $investorSubaccount)
+                        ->where('monthly_distribution', $this->parseMonthlyDistribution($monthlyDistribution))
+                        ->where('transaction_type', $transactionType)
+                        ->where('month', $month)
+                        ->where('year', $year)
+                        ->delete();
+                }
+            }
+
+            // Proceed with the import
+            FacadesExcel::import(new \App\Imports\InvestorTransactionsImport, $filePath);
+
+            // Calculate monthly statistics for the specific investor codes
+            $this->calculateMonthlyStatistics($investorCodes);
+
+            // Clean up the temporary file
+            Storage::delete($filePath);
+            $request->session()->forget('pending_upload_file');
+
+            return redirect()->route('admin.investments')->with('success', 'File uploaded and existing records overwritten successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.investments')->with('error', 'Error processing file: ' . $e->getMessage());
+        }
     }
 
-    try {
-        // Retrieve the file path from the session
-        $filePath = $request->session()->get('pending_upload_file');
-        $investorCodes = $request->session()->get('investor_codes', []);
-        // Check if the file exists
-        if (!$filePath || !Storage::exists($filePath)) {
-            return redirect()->route('admin.investments.upload')->with('error', 'Uploaded file not found. Please upload again.');
+    private function parseDate($value, $use1904System = false)
+    {
+        if (is_null($value) || $value === '') {
+            return now()->toDateString();
         }
-        // Load the file data again to get the records to delete
-        $fileData = FacadesExcel::toArray(new \App\Imports\InvestorTransactionsImport, $filePath);
-        $sheetData = $fileData[0];
-        // Delete existing records
-        foreach ($sheetData as $row) {
-            $investorCode = $row['investor_code'] ?? null;
-            $investorSubaccount = $row['investor_subaccount'] ?? $row['investor_sub_account'] ?? null;
-            // $monthlyDistribution = $row['monthly_distribution'] ?? null;
-            $transactionType = $row['transaction_type'] ?? null;
-            $month = $row['month'] ?? null;
-            $year = $row['year'] ?? null;
 
-            if ($investorCode && $investorSubaccount && $transactionType && $month && $year) {
-                Investment::where('investor_code', $investorCode)
-                    ->where('investor_subaccount', $investorSubaccount)
-                    // ->where('monthly_distribution', $monthlyDistribution)
-                    ->where('transaction_type', $transactionType)
-                    ->where('month', $month)
-                    ->where('year', $year)
-                    ->delete();
+        if (is_numeric($value)) {
+            try {
+                $baseDate = $use1904System
+                    ? \Carbon\Carbon::create(1903, 12, 31) // 1904 system
+                    : \Carbon\Carbon::create(1899, 12, 31); // 1900 system
+                $days = $use1904System ? (int)$value + 1462 : (int)$value;
+                return $baseDate->addDays($days)->toDateString();
+            } catch (\Exception $e) {
+                return now()->toDateString();
             }
         }
 
-        // Proceed with the import
-        FacadesExcel::import(new \App\Imports\InvestorTransactionsImport, $filePath);
-
-        // Calculate monthly statistics for the specific investor codes
-        $this->calculateMonthlyStatistics($investorCodes);
-
-        // Clean up the temporary file
-        Storage::delete($filePath);
-        $request->session()->forget('pending_upload_file');
-
-        return redirect()->route('admin.investments')->with('success', 'File uploaded and existing records overwritten successfully.');
-    } catch (\Exception $e) {
-        return redirect()->route('admin.investments')->with('error', 'Error processing file: ' . $e->getMessage());
+        try {
+            return \Carbon\Carbon::createFromFormat('Y/m/d', $value)->toDateString();
+        } catch (\Exception $e) {
+            return now()->toDateString();
+        }
     }
-}
+
+    private function parseMonthlyDistribution($value)
+    {
+        return $value === 'YES' ? 1 : 0;
+    }
 }
