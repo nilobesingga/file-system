@@ -4,11 +4,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InvestementController;
+use App\Http\Controllers\OpenAIController;
 use App\Http\Controllers\TwoFactorController;
-use App\Http\Middleware\Admin;
-use App\Http\Middleware\EnsureTwoFactorVerified;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 // Redirect authenticated users to dashboard or 2FA if enabled
 Route::get('/', function () {
@@ -48,6 +49,20 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
         Route::get('/users', [AdminController::class, 'listUsers'])->name('admin.users');
         Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
+
+        //Investmets
+        Route::get('/investments', [InvestementController::class, 'index'])->name('admin.investments');
+        Route::post('/investments', [InvestementController::class, 'upload'])->name('admin.investments.upload');
+        Route::get('investments/template/download', function () {
+            $path = storage_path('app/public/' . 'templates/investment-templates.xlsx');
+            if (file_exists($path)) {
+                return response()->download($path, 'investment-templates', [
+                    'Content-Type' => Storage::mimeType($path),
+                ]);
+            }
+            abort(404, 'File not found');
+        })->name('admin.investments.template.download');
+        Route::post('admin/investments/confirm-overwrite', [InvestementController::class, 'confirmOverwrite'])->name('admin.investments.confirm-overwrite');
     });
 });
 

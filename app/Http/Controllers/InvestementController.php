@@ -1,0 +1,247 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Imports\InvestorTransactionsImport;
+use App\Models\Investment;
+use App\Models\InvestmentStatistic;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel as FacadesExcel;
+
+class InvestementController extends Controller
+{
+    public function index()
+    {
+        $investments = Investment::with('user')->latest()->paginate(15);
+        $users = User::select('id', 'name')->get();
+        return view('admin.investment', compact('investments', 'users'));
+    }
+
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,xlsx',
+            'file.*' => 'max:10000', // Validate each file
+        ]);
+
+        try {
+            // Import the file into investor_transactions
+            $file = $request->file('file');
+            $fileData = FacadesExcel::toArray(new \App\Imports\InvestorTransactionsImport, $file);
+            $folderPath = 'investor/investment/' . Auth::user()->id . '/';
+            $file->store($folderPath, 'public');
+
+            // Check for existing records
+            $existingRecords = [];
+            $sheetData = $fileData[0]; // First sheet
+            // Extract unique investor codes from the file
+            $investorCodes = collect($sheetData)
+            ->pluck('investor_code')
+            ->filter() // Remove null values
+            ->unique()
+            ->values()
+            ->toArray();
+
+            foreach ($sheetData as $row) {
+                $investorCode = $row['investor_code'] ?? null;
+                $investorSubaccount = $row['investor_subaccount'] ?? $row['investor_sub_account'] ?? null;
+                $monthlyDistribution = $row['monthly_distribution'] ?? null;
+                $transactionType = $row['transaction_type'] ?? null;
+                $month = $row['month'] ?? null;
+                $year = $row['year'] ?? null;
+                $year = $row['year'] ?? null;
+                $year = $row['year'] ?? null;
+                $year = $row['year'] ?? null;
+                $year = $row['year'] ?? null;
+                $bond_series = $row['bond_serie'] ?? null;
+                $amount = $row['amount'] ?? null;
+                $investor_name = $row['investor_name'] ?? null;
+                $date = $row['date'] ?? null;
+                $transaction = $row['transaction'] ?? null;
+
+                // Skip if any required field is missing
+                if (!$investorCode || !$investorSubaccount || !$monthlyDistribution || !$transactionType || !$month || !$year) {
+                    continue;
+                }
+
+                // Check if a record with these values already exists
+                $exists = Investment::where('investor_code', $investorCode)
+                    ->where('investor_subaccount', $investorSubaccount)
+                    ->where('monthly_distribution', $monthlyDistribution)
+                    ->where('transaction_type', $transactionType)
+                    ->where('month', $month)
+                    ->where('year', $year)
+                    ->exists();
+
+                if ($exists) {
+                    $existingRecords[] = [
+                        'investor_code' => $investorCode,
+                        'investor_subaccount' => $investorSubaccount,
+                        'monthly_distribution' => $monthlyDistribution,
+                        'transaction_type' => $transactionType,
+                        'month' => $month,
+                        'investor_name' => $investor_name,
+                        'year' => $year,
+                        'bond_series' => $bond_series,
+                        'amount' => $amount,
+                        'date' => $date,
+                        'transaction' => $transaction
+                    ];
+                }
+            }
+
+            // If existing records are found, redirect to confirmation view
+            if (!empty($existingRecords)) {
+                // Store the file in the session temporarily
+                $request->session()->put('pending_upload_file', $file->store('temp'));
+                $request->session()->put('investor_codes', $investorCodes);
+                return view('admin.confirm-overwrite', [
+                    'existing_records' => $existingRecords,
+                ]);
+            }
+            FacadesExcel::import(new InvestorTransactionsImport, $request->file('file'));
+            // Calculate monthly statistics
+            $this->calculateMonthlyStatistics($investorCodes);
+
+            return redirect()->route('admin.investments')->with('success', 'File uploaded and statistics updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.investments')->with('error', 'Error uploading file: ' . $e->getMessage());
+        }
+    }
+
+    private function calculateMonthlyStatistics(array $investorCodes)
+    {
+        // Loop through each investor code
+        foreach ($investorCodes as $investorCode) {
+            // Fetch the user
+            $user = User::where('code', $investorCode)->first();
+            if (!$user) {
+                throw new \Exception('User with code '.$investorCode.' not found.');
+            }
+
+            // Fetch all transactions for the investor, ordered chronologically
+            $transactions = Investment::where('investor_code', $investorCode)
+                ->orderBy('date') // Ensure chronological order for cumulative calculations
+                ->get()
+                ->groupBy('year')
+                ->map(function ($yearGroup) {
+                    return $yearGroup->groupBy('month');
+                });
+
+            // Initialize cumulative values
+            $cumulativeBalance = 0; // For ending_balance
+            $cumulativeBonds = 0;   // For ending_bond
+            $cumulativeCapital = 0;    // For fees
+            // Loop through each year and month
+            foreach ($transactions as $year => $months) {
+                foreach ($months as $month => $monthTransactions) {
+                    // Calculate monthly metrics
+                    $monthlyCapital = $monthTransactions->where('transaction_type', Investment::TRANSACTION_TYPE_CAPITAL_DEPOSIT_WITHDRAW)->sum('amount');
+                    $monthlyCapitalGainLoss = $monthTransactions->where('transaction_type', Investment::TRANSACTION_TYPE_CAPITAL_GAIN_LOSS)->sum('amount');
+                    $monthlyNetGainLoss = $monthTransactions->whereIn('transaction_type', [
+                        Investment::TRANSACTION_TYPE_CAPITAL_GAIN_LOSS,
+                        Investment::TRANSACTION_TYPE_SUCCESS_FEE,
+                    ])->sum('amount');
+                    $monthlyFees = $monthTransactions->where('transaction_type', Investment::TRANSACTION_TYPE_SUCCESS_FEE)->sum('amount');
+                    $paidCustodianDistribution = $monthTransactions->where('transaction_type', Investment::TRANSACTION_TYPE_PAID_CUSTODIAN_DISTRIBUTION)->sum('amount');
+
+                    // Calculate bond changes for this month
+                    $bondChanges = $monthTransactions->where('transaction_type', Investment::TRANSACTION_TYPE_CAPITAL_DEPOSIT_WITHDRAW)
+                        ->map(function ($transaction) {
+                            // Assume $10,000 per bond
+                            return (int) ($transaction->amount / 10000);
+                        })->sum();
+                    $cumulativeBonds += $bondChanges;
+                    // Calculate other metrics
+                    $investorAssets = $monthTransactions->sum('amount'); // Total transactions for the month
+                    $cumulativeBalance += $investorAssets; // Update cumulative balance with total transactions
+
+                    $cumulativeCapital += $monthlyCapital;
+                    $numberOfBonds = $cumulativeCapital / 10000;
+                    $monthlyNetPercentage = $cumulativeCapital ? ($monthlyNetGainLoss / $cumulativeCapital) * 100 : 0;
+
+                    // Update or create the monthly statistic
+                    InvestmentStatistic::updateOrCreate(
+                        [
+                            'month' => $month,
+                            'year' => $year,
+                            'investor_code' => $investorCode,
+                        ],
+                        [
+                            'user_id' => $user->id,
+                            'investor_code' => $investorCode,
+                            'capital' => $cumulativeCapital,
+                            'investor_assets' => $cumulativeBalance,
+                            'capital_gain_loss' => $monthlyCapitalGainLoss,
+                            'monthly_net_gain_loss' => $monthlyNetGainLoss,
+                            'monthly_net_percentage' => $monthlyNetPercentage,
+                            'number_of_bonds' => $numberOfBonds,
+                            'fees' => $monthlyFees,
+                            'payment_distribution' => $paidCustodianDistribution,
+                            'ending_balance' => $cumulativeBalance,
+                            'ending_bond' =>  $numberOfBonds,
+                        ]
+                    );
+                }
+            }
+        }
+    }
+
+    public function confirmOverwrite(Request $request)
+    {
+    // Check if the user confirmed the overwrite
+    if ($request->input('overwrite') !== '1') {
+        return redirect()->route('admin.investments.upload')->with('error', 'Upload cancelled.');
+    }
+
+    try {
+        // Retrieve the file path from the session
+        $filePath = $request->session()->get('pending_upload_file');
+        $investorCodes = $request->session()->get('investor_codes', []);
+        // Check if the file exists
+        if (!$filePath || !Storage::exists($filePath)) {
+            return redirect()->route('admin.investments.upload')->with('error', 'Uploaded file not found. Please upload again.');
+        }
+        // Load the file data again to get the records to delete
+        $fileData = FacadesExcel::toArray(new \App\Imports\InvestorTransactionsImport, $filePath);
+        $sheetData = $fileData[0];
+        // Delete existing records
+        foreach ($sheetData as $row) {
+            $investorCode = $row['investor_code'] ?? null;
+            $investorSubaccount = $row['investor_subaccount'] ?? $row['investor_sub_account'] ?? null;
+            // $monthlyDistribution = $row['monthly_distribution'] ?? null;
+            $transactionType = $row['transaction_type'] ?? null;
+            $month = $row['month'] ?? null;
+            $year = $row['year'] ?? null;
+
+            if ($investorCode && $investorSubaccount && $transactionType && $month && $year) {
+                Investment::where('investor_code', $investorCode)
+                    ->where('investor_subaccount', $investorSubaccount)
+                    // ->where('monthly_distribution', $monthlyDistribution)
+                    ->where('transaction_type', $transactionType)
+                    ->where('month', $month)
+                    ->where('year', $year)
+                    ->delete();
+            }
+        }
+
+        // Proceed with the import
+        FacadesExcel::import(new \App\Imports\InvestorTransactionsImport, $filePath);
+
+        // Calculate monthly statistics for the specific investor codes
+        $this->calculateMonthlyStatistics($investorCodes);
+
+        // Clean up the temporary file
+        Storage::delete($filePath);
+        $request->session()->forget('pending_upload_file');
+
+        return redirect()->route('admin.investments')->with('success', 'File uploaded and existing records overwritten successfully.');
+    } catch (\Exception $e) {
+        return redirect()->route('admin.investments')->with('error', 'Error processing file: ' . $e->getMessage());
+    }
+}
+}
