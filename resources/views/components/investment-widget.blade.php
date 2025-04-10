@@ -88,7 +88,7 @@
                         },
                         datalabels: {
                             anchor: 'end',
-                            align: 'top',
+                            align: 'right',
                             offset: 5, // Add some space between the bar/line and the label
                             formatter: (value, context) => {
                                 if (context.dataset.label === "Investor's Assets ($)") {
@@ -144,11 +144,11 @@
                             position: 'bottom',
                         },
                         datalabels: {
-                            anchor: 'end',
+                            anchor: 'center',
                             align: 'top',
                             offset: 5, // Add some space between the bar and the label
                             formatter: (value) => value, // Display the raw number
-                            color: '#000',
+                            color: '#fff',
                             font: {
                                 weight: 'bold',
                                 size: 12,
