@@ -30,6 +30,14 @@
                 :monthlyBonds="$monthlyBonds"
                 :labels="$labels"
                 :newFiles="$newFiles"
+                :netPerformance="$netPerformance"
+                :netYield="$netYield"
+            />
+            <x-investment-widget :investorCode="$investor_code"/>
+            <x-user-file-system-widget
+                :totalFiles="$totalFiles"
+                :unreadFilesCount="$newFiles"
+                :recentUploadsCount="$recentUploadsCount"
             />
             <x-files-list :files="$files" :category="$category"/>
         </div>
