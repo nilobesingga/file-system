@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\CategoryUser;
 use App\Models\Files;
 use App\Models\InvestmentStatistic;
+use App\Models\User;
 use Faker\Core\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,13 +15,17 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        if(isset($request->user_id) && $user->is_admin){
+            $user = User::find($request->user_id);
+        }
         if (!$user) {
             return redirect()->route('login');
         }
 
+        $users = User::where('is_admin', 0)->get();
         // Ensure the user has the correct relationship
         $categoryIds = CategoryUser::select('category_id')->where('user_id',$user->id)->pluck('category_id')->toArray(); // FIXED: Use correct relationship
 
@@ -87,10 +92,6 @@ class DashboardController extends Controller
             ->where('is_delete',0)
             ->sum('amount_subscribed');
         $currency = 'USD';
-        // $numberOfBonds = Files::whereIn('category_id', $categoryIds)
-        //     ->where('user_id',$user->id)
-        //     ->where('is_delete',0)
-        //     ->sum('number_of_bonds');
 
         // Generate Monthly Investment Data
         $currentMonth = Carbon::now()->month;
@@ -126,9 +127,12 @@ class DashboardController extends Controller
         $monthlyBonds = array_values($monthlyBonds);
         $labels = array_values($labels);
         $investor_code = $user->code;
-        $netPerformance = InvestmentStatistic::where('investor_code', $user->code)->sum('monthly_net_gain_loss');
+        $netPerformance = InvestmentStatistic::where('investor_code', $user->code)
+                            ->where('is_publish', 1)
+                            ->sum('monthly_net_gain_loss');
         $accumilate = InvestmentStatistic::select('capital','monthly_net_percentage','number_of_bonds')
                             ->where('investor_code', $user->code)
+                            ->where('is_publish', 1)
                             ->orderBy('year')
                             ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
                             ->first();
@@ -136,6 +140,7 @@ class DashboardController extends Controller
         $netYield = $accumilate->monthly_net_percentage ?? 0;
         $numberOfBonds = $accumilate->number_of_bonds ?? 0;
         $amountInvested = $accumilate->capital ?? 0;
+        $user_id = $user->id;
         return view('dashboard', compact(
             'files',
             'newFiles',
@@ -151,7 +156,9 @@ class DashboardController extends Controller
             'labels',
             'investor_code',
             'netPerformance',
-            'netYield'
+            'netYield',
+            'users',
+            'user_id'
         ));
     }
 

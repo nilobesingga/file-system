@@ -52,6 +52,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
         //Investmets
         Route::get('/investments', [InvestementController::class, 'index'])->name('admin.investments');
+        Route::get('/investment-list', [InvestementController::class, 'investementList'])->name('admin.investment-list');
+        Route::patch('/investments/{id}/toggle-publish', [InvestementController::class, 'togglePublish'])->name('admin.investments.toggle-publish');
         Route::post('/investments', [InvestementController::class, 'upload'])->name('admin.investments.upload');
         Route::get('investments/template/download', function () {
             $path = storage_path('app/public/' . 'templates/investment-templates.xlsx');

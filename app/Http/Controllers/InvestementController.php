@@ -21,6 +21,29 @@ class InvestementController extends Controller
         return view('admin.investment', compact('investments', 'users'));
     }
 
+    public function investementList()
+    {
+        $investments = InvestmentStatistic::with('user')->latest()->paginate(15);
+        $users = User::select('id', 'name')->get();
+        return view('admin.investment-list', compact('investments', 'users'));
+    }
+
+    public function togglePublish(Request $request, $id)
+    {
+        try {
+            $statistic = InvestmentStatistic::find($id);
+            if (!$statistic) {
+                return redirect()->route('admin.investment-list')->with('error', 'Investment statistic not found.');
+            }
+            $statistic->update([
+                'is_publish' => ($statistic->is_publish == false) ? 1 : 0,
+            ]);
+            return redirect()->route('admin.investment-list')->with('success', 'Publish status updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.investment-list')->with('error', 'Error updating publish status: ' . $e->getMessage());
+        }
+    }
+
     public function upload(Request $request)
     {
         $request->validate([
@@ -32,7 +55,52 @@ class InvestementController extends Controller
             // Import the file into investor_transactions
             $file = $request->file('file');
             $fileData = FacadesExcel::toArray(new \App\Imports\InvestorTransactionsImport, $file);
+            // Check if the file has data
+            if (empty($fileData) || empty($fileData[0])) {
+                return redirect()->route('admin.investments')->with('error', 'The uploaded file is empty.');
+            }
+            // Define required headers
+            $requiredHeaders = [
+                "investor_code",
+                "investor_sub_account",
+                "investor_name",
+                "monthly_distribution",
+                "bond_serie",
+                "amount",
+                "date",
+                "transaction_type",
+                "transaction",
+                "month",
+                "year",
+                "explanation"
+            ];
 
+            // Extract headers from the first row
+            $sheetData = $fileData[0]; // First sheet
+            $headers = array_keys($sheetData[0]); // Get the keys (headers) from the first row
+
+            // Normalize headers (convert to lowercase, trim spaces)
+            $normalizedHeaders = array_map(function ($header) {
+                return strtolower(trim($header));
+            }, $headers);
+
+            // Check for required headers
+            $missingHeaders = [];
+            foreach ($requiredHeaders as $requiredHeader) {
+                if (!in_array($requiredHeader, $normalizedHeaders)) {
+                    // Special case for 'investor_subaccount' (also check for 'investor_sub_account')
+                    if ($requiredHeader === 'investor_subaccount' && in_array('investor_sub_account', $normalizedHeaders)) {
+                        continue; // Accept 'investor_sub_account' as a valid alternative
+                    }
+                    $missingHeaders[] = $requiredHeader;
+                }
+            }
+
+            // If any required headers are missing, return an error
+            if (!empty($missingHeaders)) {
+                $missingList = implode(', ', $missingHeaders);
+                return redirect()->route('admin.investments')->with('error', "The uploaded file is missing the following required columns: {$missingList}.");
+            }
             $folderPath = 'investor/investment/' . Auth::user()->id . '/';
             $file->store($folderPath, 'public');
 
