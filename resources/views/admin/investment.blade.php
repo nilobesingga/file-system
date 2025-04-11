@@ -48,20 +48,32 @@
                             @enderror
                         </div>
 
-                        <div class="flex items-center justify-between">
-                            <a href="{{ route('admin.investments.template.download') }}" download class="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800">
-                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                </svg>
-                                Download Template
-                            </a>
-                            <button type="submit" id="submit-btn" class="inline-flex items-center px-4 py-2 font-semibold text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                <span id="submit-text">Upload</span>
-                                <svg id="loading-spinner" class="hidden w-5 h-5 ml-2 text-white animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </button>
+                        <div class="flex items-center">
+                            <!-- Left: Download Template -->
+                            <div class="flex-1">
+                                <a href="{{ route('admin.investments.template.download') }}" download class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Download Template
+                                </a>
+                            </div>
+
+                            <!-- Right: Upload and View Investment List -->
+                            <div class="flex items-center space-x-3">
+                                <button type="submit" id="submit-btn" class="inline-flex items-center px-5 py-1.5 leading-7 bg-customBlue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-customBlue/90 focus:bg-customBlue/90 active:bg-customBlue/90 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition ease-in-out duration-200">
+                                    <span id="submit-text">
+                                        Upload
+                                    </span>
+                                    <svg id="loading-spinner" class="hidden w-5 h-5 ml-2 text-white animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </button>
+                                <a href="{{ route('admin.investment-list') }}" class="inline-flex items-center px-5 py-1.5 leading-7 bg-customGreen border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green focus:bg-green-20 active:bg-customGreen/90 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition ease-in-out duration-200">
+                                    View Investment
+                                </a>
+                            </div>
                         </div>
                     </form>
 

@@ -58,6 +58,12 @@
                             </span>
                         </a>
                     </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap {{ (!Auth::user()->is_admin) ? 'hidden' : '' }}">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'statement_no', 'direction' => request('sort') === 'statement_no' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Statement Number">
+                            Investor Name
+                            <x-sort-icon column="statement_no" />
+                        </a>
+                    </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap ">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'document_name', 'direction' => request('sort') === 'document_name' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Document Name">
                             Bond Name
@@ -176,6 +182,7 @@
                             </span>
                         </div>
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap {{ (!Auth::user()->is_admin) ? 'hidden' : '' }}">{{ $file->user->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->document_name ?? $file->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->statement_no }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->statement_period ? \Carbon\Carbon::parse($file->statement_period)->format('M Y') : '-' }}</td>

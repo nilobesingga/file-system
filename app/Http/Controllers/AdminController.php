@@ -8,6 +8,7 @@ use App\Models\Files;
 use App\Models\Investment;
 use App\Models\InvestmentStatistic;
 use App\Models\User;
+use App\Notifications\NewStatementNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +26,7 @@ class AdminController extends Controller
 
         $totalFiles = $files->count();
         $unreadFilesCount = \App\Helpers\FileHelper::getNotication();
-        $recentUploadsCount = Files::where('created_by',Auth::user()->id)->where('created_at', '>=', now()->subDays(7))->count();
+        $recentUploadsCount = Files::where('created_by',Auth::user()->id)->where('is_delete',0)->where('created_at', '>=', now()->subDays(7))->count();
         return view('admin.dashboard', compact('files', 'categories', 'users', 'totalFiles', 'unreadFilesCount', 'recentUploadsCount'));
     }
 
@@ -77,7 +78,11 @@ class AdminController extends Controller
                     'created_by' => Auth::user()->id
                 ]);
             }
+            $user = User::where('id', $userId)->first();
+            $portalUrl = url('/dashboard');
+            $user->notify(new NewStatementNotification($portalUrl));
             DB::commit();
+
             return response()->json(['success' => true], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();

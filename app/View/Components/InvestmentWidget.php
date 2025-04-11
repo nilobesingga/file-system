@@ -26,6 +26,7 @@ class InvestmentWidget extends Component
     public function render()
     {
         $statistics = InvestmentStatistic::where('investor_code', $this->investorCode)
+            ->where('is_publish', 1)
             ->orderBy('year')
             ->orderByRaw("FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')")
             ->get();

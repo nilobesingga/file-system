@@ -45,10 +45,37 @@
                             <li>
                                 <a href="{{ route('admin.dashboard') }}"
                                    class="flex items-center pl-5 pr-2 py-4 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-tl from-customBlue to-customBlue/60 text-white' : 'hover:bg-customBlue/10' }}">
+                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-3 size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                  </svg>
+                                    Admin
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('dashboard') }}"
+                                   class="flex items-center pl-5 pr-2 py-4 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-gradient-to-tl from-customBlue to-customBlue/60 text-white' : 'hover:bg-customBlue/10' }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-3 size-5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                                     </svg>
-                                    Dashboard
+                                    Investor Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('admin.investment-list') }}"
+                                   class="flex items-center pl-5 pr-2 py-4 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.investment-list') ? 'bg-gradient-to-tl from-customBlue to-customBlue/60 text-white' : 'hover:bg-customBlue/10' }}">
+                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-3 size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                  </svg>
+                                    Investment Record
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('admin.investments') }}"
+                                   class="flex items-center pl-5 pr-2 py-4 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.investments') ? 'bg-gradient-to-tl from-customBlue to-customBlue/60 text-white' : 'hover:bg-customBlue/10' }}">
+                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-3 size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                    </svg>
+                                    Investment Entry
                                 </a>
                             </li>
                             <li>
@@ -58,15 +85,6 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                     </svg>
                                     Upload Files
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('admin.investments') }}"
-                                   class="flex items-center pl-5 pr-2 py-4 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.investments') ? 'bg-gradient-to-tl from-customBlue to-customBlue/60 text-white' : 'hover:bg-customBlue/10' }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-3 size-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                    </svg>
-                                    Investment Entry
                                 </a>
                             </li>
                             <li>
