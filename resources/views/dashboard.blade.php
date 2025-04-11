@@ -20,6 +20,21 @@
         @endif
 
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            @if (Auth::user()->is_admin)
+            <div class="mb-2 sm:w-1/3">
+                <form id="investor-form" action="{{ route('dashboard') }}" method="get" x-data>
+                    <select name="user_id" id="user_id"
+                        class="block w-full p-2 border rounded-md focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        @change="$el.form.submit()">
+                        <option value="">Select Investor</option>
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}" {{ $user->id == $user_id ? 'selected' : '' }}>
+                                {{ $user->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
             <x-dashboard-widget
                 :recentUploadsCount="$recentUploadsCount"
                 :totalFiles="$totalFiles"
@@ -30,6 +45,15 @@
                 :monthlyBonds="$monthlyBonds"
                 :labels="$labels"
                 :newFiles="$newFiles"
+                :netPerformance="$netPerformance"
+                :netYield="$netYield"
+            />
+            <x-investment-widget :investorCode="$investor_code"/>
+            @endif
+            <x-user-file-system-widget
+                :totalFiles="$totalFiles"
+                :unreadFilesCount="$newFiles"
+                :recentUploadsCount="$recentUploadsCount"
             />
             <x-files-list :files="$files" :category="$category"/>
         </div>

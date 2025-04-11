@@ -14,10 +14,19 @@ return new class extends Migration
         if (!Schema::hasTable('investment_statistics')) {
             Schema::create('investment_statistics', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('investment_id')->constrained()->onDelete('cascade');
-                $table->decimal('monthly_investment', 15, 2);
-                $table->decimal('monthly_interest', 15, 2)->nullable();
-                $table->date('month');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('investor_code');
+                $table->string('month');
+                $table->integer('year');
+                $table->decimal('capital',15,2);
+                $table->decimal('investor_assets', 15, 2);
+                $table->decimal('capital_gain_loss',15,2);
+                $table->decimal('monthly_net_gain_loss', 15, 2);
+                $table->decimal('fees', 15, 2);
+                $table->decimal('payment_distribution', 15, 2);
+                $table->decimal('monthly_net_percentage', 5, 2);
+                $table->integer('number_of_bonds');
+                $table->decimal('ending_balance',15,2)->nullable();
                 $table->timestamps();
             });
         }

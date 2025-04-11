@@ -1,10 +1,4 @@
 <x-app-layout>
-    {{-- <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            Upload Files
-        </h2>
-    </x-slot> --}}
-
     <div class="py-3">
         <div class="w-full mx-auto sm:px-6 lg:px-20">
             @if (session('success'))
@@ -12,7 +6,7 @@
                     {{ session('success') }}
                 </div>
             @endif
-            <div class="p-7 mb-4 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+            <div class="mb-4 overflow-hidden bg-white shadow-sm p-7 sm:rounded-lg">
                 <h3 class="mb-4 text-2xl font-semibold text-gray-900">Upload Files</h3>
                 <form action="{{ route('admin.upload') }}" method="POST" enctype="multipart/form-data" id="dropzoneForm" class="space-y-4">
                     @csrf
@@ -24,7 +18,7 @@
                         </div>
                         <div class="sm:w-1/2">
                             <x-input-label for="category_ids" class="" :value="__('Categories *')" />
-                            <select name="category_id" id="category_id" data-choice class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm" required>
+                            <select name="category_id" id="category_id" data-choice class="block w-full mt-1 text-sm text-gray-900 border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500" required>
                                 <option value="">Select Category</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -61,18 +55,19 @@
                         </div>
                         <div class="sm:w-1/2">
                             <x-input-label for="statement_period" class="" :value="__('Statement Period *')" />
-                            <input type="date" id="statement_period" name="statement_period" class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm" required>
+                            <input type="date" id="statement_period" name="statement_period" class="block w-full mt-1 text-sm text-gray-900 border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500" required>
                             <x-input-error :messages="$errors->get('statement_period')" class="mt-2" id="statement_period_error" />
                         </div>
                     </div>
-                    <div class="flex flex-row gap-2 mt-4">
+                    <div class="flex flex-row hidden gap-2 mt-4">
                         <div class="sm:w-1/2">
                             <x-input-label for="number_of_bonds" class="" :value="__('Number of Bonds *')" />
                             <x-text-input
                                 id="number_of_bonds"
                                 name="number_of_bonds"
+                                value="0"
                                 type="text"
-                                class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm"
+                                class="block w-full mt-1 text-sm text-gray-900 border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500"
                                 placeholder="Enter number of bonds"
                                 required
                             />
@@ -83,6 +78,7 @@
                             <x-text-input
                                 id="amount_subscribed"
                                 name="amount_subscribed"
+                                value="0.00"
                                 type="text"
                                 class="block w-full mt-1 text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none"
                                 placeholder="0.00"
@@ -92,7 +88,7 @@
                         </div>
                         <div class="sm:w-1/2">
                             <x-input-label for="currency" class="" :value="__('Currency *')" />
-                            <select name="currency" id="currency" data-choice class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm" required>
+                            <select name="currency" id="currency" data-choice class="block w-full mt-1 text-sm text-gray-900 border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500" required>
                                 <option value="">Select Currency</option>
                                 <option value="USD" selected>USD</option>
                                 <option value="AED">AED</option>
@@ -117,7 +113,6 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                         </svg>
-
                         Upload Files
                     </button>
                     <div id="dropzoneErrors" class="hidden mt-2 text-sm text-red-600"></div>

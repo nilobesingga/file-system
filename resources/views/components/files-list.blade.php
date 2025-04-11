@@ -1,4 +1,4 @@
-<div class="px-7 py-6 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+<div class="py-6 overflow-hidden bg-white shadow-sm px-7 sm:rounded-lg">
     <!-- Search Bar with Loading Indicator -->
     <div class="relative flex items-center justify-between mb-4">
         <h3 class="text-xl font-bold text-gray-900">Files</h3>
@@ -6,7 +6,7 @@
         <div class="flex items-center space-x-4">
             <!-- Category Filter Dropdown -->
             <div>
-                <select id="categoryFilter" onchange="filterTableByCategory()" class="px-4 py-2 text-gray-700 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm">
+                <select id="categoryFilter" onchange="filterTableByCategory()" class="px-4 py-2 text-gray-700 border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
                     <option value="">All Categories</option>
                     @foreach($category as $cat)
                         <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -18,7 +18,7 @@
             <div class="relative">
                 <input type="text" id="searchInput" onkeyup="searchTable()"
                        placeholder="Search files..."
-                       class="px-4 py-2 text-gray-700 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm">
+                       class="px-4 py-2 text-gray-700 border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
 
                 <!-- Loading Spinner -->
                 <div id="loadingSpinner" class="absolute hidden transform -translate-y-1/2 right-3 top-1/2">
@@ -58,9 +58,15 @@
                             </span>
                         </a>
                     </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap {{ (!Auth::user()->is_admin) ? 'hidden' : '' }}">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'statement_no', 'direction' => request('sort') === 'statement_no' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Statement Number">
+                            Investor Name
+                            <x-sort-icon column="statement_no" />
+                        </a>
+                    </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap ">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'document_name', 'direction' => request('sort') === 'document_name' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Document Name">
-                            Document Name
+                            Bond Name
                             <span class="ml-2 sort-icon" data-column="1">
                                 @if(request('sort') === 'document_name')
                                     @if(request('direction') === 'asc')
@@ -92,7 +98,7 @@
                             <x-sort-icon column="statement_period" />
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
+                    {{-- <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'number_of_bonds', 'direction' => request('sort') === 'number_of_bonds' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Number of Bonds">
                             No. of Bonds
                             <x-sort-icon column="number_of_bonds" />
@@ -103,7 +109,7 @@
                             Amount
                             <x-sort-icon column="amount_subscribed" />
                         </a>
-                    </th>
+                    </th> --}}
                     <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer text-nowrap">
                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'category', 'direction' => request('sort') === 'category' && request('direction') === 'desc' ? 'asc' : 'desc']) }}" aria-label="Sort by Category">
                             Category
@@ -176,11 +182,12 @@
                             </span>
                         </div>
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap {{ (!Auth::user()->is_admin) ? 'hidden' : '' }}">{{ $file->user->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->document_name ?? $file->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->statement_no }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->statement_period ? \Carbon\Carbon::parse($file->statement_period)->format('M Y') : '-' }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ number_format($file->number_of_bonds) }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->currency }} {{ number_format($file->amount_subscribed, 2) }}</td>
+                    {{-- <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ number_format($file->number_of_bonds) }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $file->currency }} {{ number_format($file->amount_subscribed, 2) }}</td> --}}
                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap" data-category-id="{{ $file->category ? $file->category->id : '' }}">
                         {{ $file->category ? $file->category->name : 'Uncategorized' }}
                     </td>

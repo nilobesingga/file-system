@@ -8,6 +8,10 @@ class Investment extends Model
 {
     protected $table = 'investment';
     protected $guarded = ['id'];
+    const TRANSACTION_TYPE_CAPITAL_DEPOSIT_WITHDRAW = 101;
+    const TRANSACTION_TYPE_CAPITAL_GAIN_LOSS = 102;
+    const TRANSACTION_TYPE_SUCCESS_FEE = 201;
+    const TRANSACTION_TYPE_PAID_CUSTODIAN_DISTRIBUTION = 301;
 
     public function user()
     {
