@@ -9,9 +9,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel as FacadesExcel;
-
 class InvestementController extends Controller
 {
     public function index()
@@ -338,5 +339,156 @@ class InvestementController extends Controller
     private function parseMonthlyDistribution($value)
     {
         return $value === 'YES' ? 1 : 0;
+    }
+
+    public function show($id)
+    {
+        // Fetch statement data (replace with your actual data retrieval logic)
+        $statement = InvestmentStatistic::with(['user'])->findOrFail($id);
+        $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction')
+                        ->where('investor_code', $statement->investor_code)
+                        ->where('month', $statement->month)
+                        ->where('year', $statement->year)
+                        ->groupBy('date', 'transaction_type','transaction','amount')
+                        ->get();
+        $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
+        $transact['opening'][] = array(
+            'date' => $firstDay,
+            'transaction' => 'Opening Balance',
+            'amount' => 0.00,
+            'balance' => 0.00,
+            'opening' => true
+        );
+        $balance = 0;
+        foreach ($transactions as $trans) {
+            $xdata = $trans->toArray();
+            $xdata['date'] = date('d M Y', strtotime($trans->date));
+            $xdata['description'] = $trans->transaction;
+            $balance += $trans->amount;
+            $xdata['balance'] = $balance;
+            $transact[$trans->date][] = $xdata;
+        }
+        $monthName = $statement->month;
+        $year = $statement->year;
+        $date = Carbon::createFromFormat('F Y', "$monthName $year");
+        // Get the last day of the month
+        $lastDay = $date->endOfMonth()->toDateString();
+        $transact['closing'][] = array(
+            'date' => date('d M Y',strtotime($lastDay)),
+            'transaction' => 'Closing Balance',
+            'amount' => "0",
+            'balance' => $statement->ending_balance,
+            'closing' => true
+        );
+        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
+        $statementData = [
+            'statement_number' => $statement->statement_number ?? 'CLP-25-012',
+            'date' => $statement->date ?? '05 Mar 2025',
+            'customer_id' => $statement->user->code ?? 'GURUSD',
+            'customer_name' => $statement->user->name ?? 'Gurcan Gurel',
+            'address' => $statement->user->address ?? 'Kucukbebek Dere Clkmazi 11/3, 34433 Bebek/Istanbul, Turkey',
+            'bonds_subscribed' => $statement->number_of_bonds ?? 0,
+            'total_amount_subscribed' => $statement->capital ?? 0.00,
+            'bond_name' => $statement->bond_name ?? 'Sky Hybrid SA Ltd Bonds Series 001',
+            'period_distribution' => $statement->month ." ". $statement->year ." / Monthly" ?? '',
+            'statement_period' => $statement_period ?? '',
+            'transactions' => $transact ?? [],
+            'gross_capital_gain' => $statement->capital_gain_loss ?? 0.00,
+            'net_amount' => $statement->ending_balance ?? 0.00,
+        ];
+        return view('admin.statements', compact('statementData'));
+    }
+
+    public function pdf($id)
+    {
+        $statement = InvestmentStatistic::with(['user'])->findOrFail($id);
+        $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction')
+                        ->where('investor_code', $statement->investor_code)
+                        ->where('month', $statement->month)
+                        ->where('year', $statement->year)
+                        ->groupBy('date', 'transaction_type','transaction','amount')
+                        ->get();
+        $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
+        $transact['opening'][] = array(
+            'date' => $firstDay,
+            'transaction' => 'Opening Balance',
+            'amount' => 0.00,
+            'balance' => 0.00,
+            'opening' => true
+        );
+        $balance = 0;
+        foreach ($transactions as $trans) {
+            $xdata = $trans->toArray();
+            $xdata['date'] = date('d M Y', strtotime($trans->date));
+            $xdata['description'] = $trans->transaction;
+            $balance += $trans->amount;
+            $xdata['balance'] = $balance;
+            $transact[$trans->date][] = $xdata;
+        }
+        $monthName = $statement->month;
+        $year = $statement->year;
+        $date = Carbon::createFromFormat('F Y', "$monthName $year");
+        // Get the last day of the month
+        $lastDay = $date->endOfMonth()->toDateString();
+        $transact['closing'][] = array(
+            'date' => date('d M Y',strtotime($lastDay)),
+            'transaction' => 'Closing Balance',
+            'amount' => "0",
+            'balance' => $statement->ending_balance,
+            'closing' => true
+        );
+        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
+        $statementData = [
+            'statement_number' => $statement->statement_number ?? 'CLP-25-012',
+            'date' => $statement->date ?? '05 Mar 2025',
+            'customer_id' => $statement->user->code ?? 'GURUSD',
+            'customer_name' => $statement->user->name ?? 'Gurcan Gurel',
+            'address' => $statement->user->address ?? 'Kucukbebek Dere Clkmazi 11/3, 34433 Bebek/Istanbul, Turkey',
+            'bonds_subscribed' => $statement->number_of_bonds ?? 0,
+            'total_amount_subscribed' => $statement->capital ?? 0.00,
+            'bond_name' => $statement->bond_name ?? 'Sky Hybrid SA Ltd Bonds Series 001',
+            'period_distribution' => $statement->month ." ". $statement->year ." / Monthly" ?? '',
+            'statement_period' => $statement_period ?? '',
+            'transactions' => $transact ?? [],
+            'gross_capital_gain' => $statement->capital_gain_loss ?? 0.00,
+            'net_amount' => $statement->ending_balance ?? 0.00,
+        ];
+
+        // Generate PDF using DOMPDF
+        $path = public_path('images/cap-lion-point-black.png');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $logo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        $pdf = Pdf::loadView('statements.pdf', compact('statementData','logo'))
+            ->setPaper('a4', 'portrait')
+            ->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+                'defaultFont' => 'helvetica',
+            ]);
+
+        // Return the PDF as a download or stream
+        // return $pdf->stream('account-statement-' . $id . '.pdf');
+
+        // For download instead of preview:
+        return $pdf->download('account-statement-' . $id . '.pdf');
+    }
+
+    public function details($id)
+    {
+        // Fetch the InvestmentStatistics record with related Investment and User
+        $statistic = InvestmentStatistic::findOrFail($id);
+        $transactions = Investment::where('investor_code', $statistic->investor_code)
+                        ->where('month', $statistic->month)
+                        ->where('year', $statistic->year)
+                        ->get();
+        $transactions = array_map(function($row){
+            $row['date'] = date('d M Y',strtotime($row['date']));
+            $row['amount'] = number_format($row['amount'],2);
+            return $row;
+        },$transactions->toArray());
+        return response()->json([
+            'transactions' => $transactions,
+        ]);
     }
 }

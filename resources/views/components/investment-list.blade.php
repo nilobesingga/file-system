@@ -108,46 +108,54 @@
         <table class="min-w-full border border-collapse border-gray-300">
             <thead>
                 <tr>
-                    <th class="px-4 py-2 text-left border border-gray-300">Code</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Investor Name</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Month / Year</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Capital</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Investor Assets</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Capital Gain/Loss</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Monthly Net Gain/Loss</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Fees</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Payment Distribution</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Monthly Net Percentage</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Number of Bonds</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Ending Balance</th>
-                    <th class="px-4 py-2 text-left border border-gray-300">Action</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Code</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Name</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Month / Year</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Assets</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital Gain/Loss</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Net Gain/Loss</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Fees</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Payment Distribution</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Net Percentage</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Number of Bonds</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Ending Balance</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($statistics as $stat)
                     <tr>
-                        <td class="px-4 py-2 border border-gray-300">{{ $stat->investor_code }}
-                        </td>
-                        <td class="px-4 py-2 border border-gray-300 text-nowrap">{{ $stat->user->name }}</td>
-                        <td class="px-4 py-2 lowercase border border-gray-300 text-nowrap first-letter:capitalize">{{ ucfirst(substr($stat->month, 0, 3)) . " " . $stat->year}}</td>
-                        <td class="px-4 py-2 border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
-                        <td class="px-4 py-2 border border-gray-300 text-end">{{ number_format($stat->investor_assets, 2) }}</td>
-                        <td class="px-4 py-2 border border-gray-300 text-end {{ $stat->capital_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->capital_gain_loss, 2) }}</td>
-                        <td class="px-4 py-2 border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
-                        <td class="px-4 py-2 text-red-600 border border-gray-300 text-end">{{ number_format($stat->fees, 2) }}</td>
-                        <td class="px-4 py-2 border border-gray-300 text-end {{ $stat->payment_distribution < 0 ? 'text-red-600' : '' }}">{{ number_format($stat->payment_distribution, 2) }}</td>
-                        <td class="px-4 py-2 border border-gray-300 text-end {{ $stat->monthly_net_percentage < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_percentage, 2) }}%</td>
-                        <td class="px-4 py-2 border border-gray-300">{{ $stat->number_of_bonds }}</td>
-                        <td class="px-4 py-2 border border-gray-300">{{ number_format($stat->ending_balance, 2) }}</td>
-                        <td class="px-4 py-2 border border-gray-300">
+                        <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->investor_code }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">{{ $stat->user->name }}</td>
+                        <td class="px-4 py-2 text-[11px] lowercase border border-gray-300 text-nowrap first-letter:capitalize">{{ ucfirst(substr($stat->month, 0, 3)) . " " . $stat->year}}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->investor_assets, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->capital_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->capital_gain_loss, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] text-red-600 border border-gray-300 text-end">{{ number_format($stat->fees, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->payment_distribution < 0 ? 'text-red-600' : '' }}">{{ number_format($stat->payment_distribution, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_percentage < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_percentage, 2) }}%</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->number_of_bonds }}</td>
+                        <td class="px-4 py-2 text-[11px] text-right border border-gray-300">{{ number_format($stat->ending_balance, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">
                             <form action="{{ route('admin.investments.toggle-publish', $stat->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="is_publish" value="{{ $stat->is_publish ? 0 : 1 }}">
-                                <button type="submit" class="inline-flex items-center px-3 py-1.5 text-sm text-white rounded-md  transition-all duration-200 {{ $stat->is_publish ? 'bg-red-600 hover:bg-red-700' : 'bg-customBlue hover:bg-customBlue/90' }}">
+                                <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 {{ $stat->is_publish ? 'bg-red-600 hover:bg-red-700' : 'bg-customBlue hover:bg-customBlue/90' }}">
                                     {{ __($stat->is_publish ? 'Unpublish' : 'Publish') }}
                                 </button>
                             </form>
+                            <button type="button" onclick="openDetailModal({{ $stat->id }})" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md transition-all duration-200 bg-blue-600 hover:bg-blue-700">
+                                Detail View
+                            </button>
+                            <a href="{{ route('statements.show',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customBlue hover:bg-customBlue/90' }}">
+                                {{ 'Preview' }}
+                            </a>
+                            <a href="{{ route('statements.pdf',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customGreen hover:bg-customBlue/90' }}">
+                                {{ 'Download' }}
+                            </a>
                         </td>
                     </tr>
                 @empty
@@ -165,4 +173,77 @@
     <div class="mt-6">
         {{ $statistics->links() }}
     </div>
+
+    <!-- Modal Structure -->
+    <div id="detail-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black opacity-50" onclick="closeDetailModal()"></div>
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-6xl p-6 bg-white rounded-lg shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Investment Transaction Details</h3>
+                <button onclick="closeDetailModal()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Table -->
+            <div id="modal-content" class="overflow-x-auto">
+                <!-- Table will be populated dynamically via JavaScript -->
+            </div>
+        </div>
+    </div>
 </div>
+<!-- JavaScript for Modal -->
+<script>
+    function openDetailModal(statId) {
+        // Fetch transaction details via AJAX
+        fetch(`/admin/investments/${statId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                const modalContent = document.getElementById('modal-content');
+                modalContent.innerHTML = `
+                    <table class="min-w-full border border-collapse border-gray-300">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Code</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Subaccount</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Name</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Distribution</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Bond Series</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Amount</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Date</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Transaction</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Month</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.transactions.map(transaction => `
+                                <tr>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.investor_code}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.investor_subaccount}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.investor_name}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300">${(transaction.monthly_distribution ? 'YES' : 'NO')}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.bond_series}</td>
+                                    <td class="px-4 py-2 text-[11px] text-right border border-gray-300 ${(transaction.amount < 0 ? 'text-red-600' : 'text-green-600')}">${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.date}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.transaction}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.month}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.year}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('detail-modal').classList.remove('hidden');
+            })
+            .catch(error => console.error('Error fetching transaction details:', error));
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detail-modal').classList.add('hidden');
+        document.getElementById('modal-content').innerHTML = '';
+    }
+</script>

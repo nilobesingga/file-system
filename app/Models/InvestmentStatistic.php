@@ -14,7 +14,7 @@ class InvestmentStatistic extends Model
     ];
     public function investment()
     {
-        return $this->belongsTo(Investment::class);
+        return $this->hasMany(Investment::class, 'investor_code','investor_code');
     }
 
     public function user()
