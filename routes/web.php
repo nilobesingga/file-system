@@ -65,6 +65,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
             abort(404, 'File not found');
         })->name('admin.investments.template.download');
         Route::post('admin/investments/confirm-overwrite', [InvestementController::class, 'confirmOverwrite'])->name('admin.investments.confirm-overwrite');
+        Route::get('/statements/{id}', [InvestementController::class, 'show'])->name('statements.show');
+        Route::get('/statements/{id}/pdf', [InvestementController::class, 'pdf'])->name('statements.pdf');
+        Route::get('/investments/{id}/details', [InvestementController::class, 'details'])->name('investments.details');
     });
 });
 
