@@ -47,6 +47,8 @@
                 :newFiles="$newFiles"
                 :netPerformance="$netPerformance"
                 :netYield="$netYield"
+                :hwlcd="$hwlcd"
+                :hwlmd="$hwlmd"
             />
             <x-investment-widget :investorCode="$investor_code"/>
             @endif
