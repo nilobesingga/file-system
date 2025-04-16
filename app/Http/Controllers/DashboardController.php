@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\CategoryUser;
 use App\Models\Files;
+use App\Models\Investment;
 use App\Models\InvestmentStatistic;
 use App\Models\User;
 use Faker\Core\File;
@@ -141,6 +142,23 @@ class DashboardController extends Controller
         $numberOfBonds = $accumilate->number_of_bonds ?? 0;
         $amountInvested = $accumilate->capital ?? 0;
         $user_id = $user->id;
+        // Get the last High Watermark Level of Compounded Distribution
+        $hwlcd = Investment::select('amount')
+                                ->where('investor_code', $user->code)
+                                ->where('transaction_type', Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION)
+                                ->orderBy('year')
+                                ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
+                                ->pluck('amount')
+                                ->first();
+        //High Watermark Level of Monthly Distribution
+        $hwlmd = Investment::select('amount')
+                        ->where('investor_code', $user->code)
+                        ->where('transaction_type', Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION)
+                        ->orderBy('year')
+                        ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
+                        ->pluck('amount')
+                        ->first();
+
         return view('dashboard', compact(
             'files',
             'newFiles',
@@ -158,7 +176,9 @@ class DashboardController extends Controller
             'netPerformance',
             'netYield',
             'users',
-            'user_id'
+            'user_id',
+            'hwlcd',
+            'hwlmd'
         ));
     }
 

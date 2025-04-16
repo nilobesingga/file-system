@@ -115,7 +115,8 @@ class InvestementController extends Controller
             ->unique()
             ->values()
             ->toArray();
-
+            // Loop through the data and check for existing records
+            $counter = 1;
             foreach ($sheetData as $row) {
                 $investorCode = $row['investor_code'] ?? null;
                 $investorSubaccount = $row['investor_subaccount'] ?? $row['investor_sub_account'] ?? null;
@@ -142,6 +143,14 @@ class InvestementController extends Controller
                     ->where('month', $month)
                     ->where('year', $year)
                     ->exists();
+                $isPublish = InvestmentStatistic::where('investor_code', $investorCode)
+                            ->where('month', $month)
+                            ->where('year', $year)
+                            ->where('is_publish', 1)
+                            ->exists();
+                if ($isPublish) {
+                    return redirect()->route('admin.investments')->with('error', 'The file cannot be uploaded because the statement is already published. Line no '.$counter . " Investor Code: " . $investorCode . " Month: " . $month . " Year: " . $year);
+                }
 
                 if ($exists) {
                     $existingRecords[] = [
