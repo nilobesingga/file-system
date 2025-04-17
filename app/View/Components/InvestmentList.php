@@ -77,7 +77,7 @@ class InvestmentList extends Component
             'statistics' => $statistics,
             'investorCode' => $this->investorCode,
             'investors' => $investors,
-            'months' => $months,
+            'months' => $months
         ]);
     }
 }

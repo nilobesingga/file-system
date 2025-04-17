@@ -1,4 +1,4 @@
-<div x-data="userMultiSelect({{ json_encode($selections) }})" class="relative w-full">
+<div x-data="userMultiSelect({{ json_encode($selections) }}, {{ json_encode($selected) }})" class="relative w-full">
     <!-- Selected Items -->
     <div class="flex flex-wrap items-center justify-between p-1 bg-white border border-gray-300 rounded-md cursor-pointer min-h-[40px]"
          @click="open = !open">
@@ -41,10 +41,10 @@
 </div>
 
 <script>
-    function userMultiSelect(usersData) {
+    function userMultiSelect(usersData, selectedData) {
         return {
             users: usersData,
-            selectedUsers: [],
+            selectedUsers: usersData.filter(user => selectedData.includes(user.name)) ?? [],
             search: '',
             open: false,
             filteredUsers: usersData,
