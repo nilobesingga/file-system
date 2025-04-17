@@ -143,21 +143,33 @@ class DashboardController extends Controller
         $amountInvested = $accumilate->capital ?? 0;
         $user_id = $user->id;
         // Get the last High Watermark Level of Compounded Distribution
-        $hwlcd = Investment::select('amount')
-                                ->where('investor_code', $user->code)
-                                ->where('transaction_type', Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION)
-                                ->orderBy('year')
-                                ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
+        $hwlcd = Investment::select('investment.amount')
+                                ->join('investment_statistics', function($join) {
+                                    $join->on('investment.investor_code', '=', 'investment_statistics.investor_code')
+                                        ->on('investment.year', '=', 'investment_statistics.year')
+                                        ->on('investment.month', '=', 'investment_statistics.month');
+                                })
+                                ->where('investment.investor_code', $user->code)
+                                ->where('investment.transaction_type', Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION)
+                                ->where('investment_statistics.is_publish', 1)
+                                ->orderBy('investment.year')
+                                ->orderByRaw("FIELD(investment.month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
                                 ->pluck('amount')
                                 ->first();
         //High Watermark Level of Monthly Distribution
-        $hwlmd = Investment::select('amount')
-                        ->where('investor_code', $user->code)
-                        ->where('transaction_type', Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION)
-                        ->orderBy('year')
-                        ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
-                        ->pluck('amount')
-                        ->first();
+        $hwlmd = Investment::select('investment.amount')
+                    ->join('investment_statistics', function($join) {
+                        $join->on('investment.investor_code', '=', 'investment_statistics.investor_code')
+                            ->on('investment.year', '=', 'investment_statistics.year')
+                            ->on('investment.month', '=', 'investment_statistics.month');
+                    })
+                    ->where('investment.investor_code', $user->code)
+                    ->where('investment.transaction_type', Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION)
+                    ->where('investment_statistics.is_publish', 1)
+                    ->orderBy('investment.year')
+                    ->orderByRaw("FIELD(investment.month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
+                    ->pluck('amount')
+                    ->first();
 
         return view('dashboard', compact(
             'files',
