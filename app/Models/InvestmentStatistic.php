@@ -14,11 +14,16 @@ class InvestmentStatistic extends Model
     ];
     public function investment()
     {
-        return $this->belongsTo(Investment::class);
+        return $this->hasMany(Investment::class, 'investor_code','investor_code');
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function statement()
+    {
+        return $this->hasOne(StatementSeries::class, 'statement_id', 'id');
     }
 }

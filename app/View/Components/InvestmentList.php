@@ -26,7 +26,7 @@ class InvestmentList extends Component
     public function render()
     {
         // Build query
-        $query = InvestmentStatistic::query()->with('user');
+        $query = InvestmentStatistic::query()->with('user','statement');
 
         // Apply sorting
         $query->orderBy('investor_code')
@@ -58,6 +58,10 @@ class InvestmentList extends Component
             });
         }
 
+        if (request('is_publish') !== null) {
+            $query->where('is_publish', request('is_publish'));
+        }
+
         // Paginate results (10 per page)
         $statistics = $query->paginate(10);
 
@@ -77,7 +81,7 @@ class InvestmentList extends Component
             'statistics' => $statistics,
             'investorCode' => $this->investorCode,
             'investors' => $investors,
-            'months' => $months,
+            'months' => $months
         ]);
     }
 }

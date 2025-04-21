@@ -17,6 +17,9 @@ class DashboardWidget extends Component
     public $newFiles;
     public $netPerformance;
     public $netYield;
+    public $hwlcd;
+    public $hwlmd;
+
 
     public function __construct(
         $amountInvested,
@@ -29,7 +32,9 @@ class DashboardWidget extends Component
         $recentUploadsCount,
         $newFiles,
         $netPerformance,
-        $netYield
+        $netYield,
+        $hwlcd,
+        $hwlmd
         ){
         $this->totalFiles = $totalFiles;
         $this->amountInvested = $amountInvested;
@@ -42,6 +47,8 @@ class DashboardWidget extends Component
         $this->newFiles = $newFiles;
         $this->netPerformance = $netPerformance;
         $this->netYield = $netYield;
+        $this->hwlcd = $hwlcd;
+        $this->hwlmd = $hwlmd;
     }
 
     public function render()

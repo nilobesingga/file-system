@@ -45,7 +45,7 @@
             <!-- Content -->
             <div>
                 <h3 class="text-sm tracking-wider uppercase font-sm opacity-80">High Watermark Level of Compounded Distribution</h3>
-                <p class="text-2xl font-bold">0.00</p>
+                <p class="text-2xl font-bold">{{ number_format($hwlcd,2) }}</p>
             </div>
         </div>
     </div>
@@ -62,7 +62,7 @@
             <!-- Content -->
             <div>
                 <h3 class="text-sm font-medium tracking-wider uppercase opacity-80">High Watermark Level of Monthly Distribution</h3>
-                <p class="text-2xl font-bold">0.00</p>
+                <p class="text-2xl font-bold">{{ number_format($hwlmd,2) }}</p>
             </div>
         </div>
         <!-- Decorative Element -->
