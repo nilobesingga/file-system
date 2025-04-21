@@ -21,4 +21,9 @@ class InvestmentStatistic extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function statement()
+    {
+        return $this->hasOne(StatementSeries::class, 'statement_id', 'id');
+    }
 }
