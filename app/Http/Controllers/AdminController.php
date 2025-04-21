@@ -71,7 +71,6 @@ class AdminController extends Controller
                     'document_name' => $document_name,
                     'statement_no' => $statement_no,
                     'statement_period' => $statement_period,
-                    'statement_period' => $statement_period,
                     'number_of_bonds' => $number_of_bonds,
                     'amount_subscribed' => $amount_subscribed,
                     'currency' => $currency,
@@ -192,7 +191,9 @@ class AdminController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'is_admin' => $isAdmin
+            'is_admin' => $isAdmin,
+            'address' => $request->address ?? null,
+            'code' => $request->code ?? null,
         ]);
 
         // Assign the user to multiple categories

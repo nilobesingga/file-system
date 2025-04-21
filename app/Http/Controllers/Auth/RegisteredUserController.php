@@ -79,7 +79,9 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password ? Hash::make($request->password) : $user->password,
-            'is_admin' => $isAdmin
+            'is_admin' => $isAdmin,
+            'address' => $request->address ?? null,
+            'code' => $request->code ?? null
         ]);
 
         if ($request->has('category_ids')) {

@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvestementController;
 use App\Http\Controllers\OpenAIController;
 use App\Http\Controllers\TwoFactorController;
+use FontLib\Table\Type\name;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -68,6 +69,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/statements/{id}', [InvestementController::class, 'show'])->name('statements.show');
         Route::get('/statements/{id}/pdf', [InvestementController::class, 'pdf'])->name('statements.pdf');
         Route::get('/investments/{id}/details', [InvestementController::class, 'details'])->name('investments.details');
+        Route::patch('/investments/generate/{id}', [InvestementController::class, 'generateStatement'])->name('admin.investments.generate');
     });
 });
 

@@ -6,13 +6,18 @@
     </x-slot> --}}
 
     <div class="py-3 mt-16">
-        <div class="w-full mx-auto max-w-4xl sm:px-6 lg:px-40">
-            <div class="p-7 overflow-hidden bg-white shadow-sm rounded-lg">
+        <div class="w-full max-w-4xl mx-auto sm:px-6 lg:px-40">
+            <div class="overflow-hidden bg-white rounded-lg shadow-sm p-7">
                 <h3 class="mb-4 text-2xl font-semibold text-gray-900">{{ $user ? 'Update User' : 'Add New User' }}</h3>
 
                 <form method="POST" action="{{ $user ? route('admin.register.update', $user->id) : route('admin.register') }}" x-data="{ showPasswordModal: false }" x-cloak>
                     @csrf
                     <!-- Name -->
+                    <div>
+                        <x-input-label for="name" :value="__('Investor Code')" />
+                        <x-text-input id="name" class="block w-full mt-1" type="text" name="code" :value="old('code', $user ? $user->code : '')" required autofocus autocomplete="code" />
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                    </div>
                     <div>
                         <x-input-label for="name" :value="__('Name')" />
                         <x-text-input id="name" class="block w-full mt-1" type="text" name="name" :value="old('name', $user ? $user->name : '')" required autofocus autocomplete="name" />
@@ -44,7 +49,7 @@
                         <button type="button" @click="showPasswordModal = true" class="inline-flex items-center px-4 py-2 text-gray-800 transition-all duration-200 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                             Update Password
                         </button>
-                        <div x-show="showPasswordModal" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="fixed inset-0 flex items-center justify-center bg-sky-950/90 z-50">
+                        <div x-show="showPasswordModal" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="fixed inset-0 z-50 flex items-center justify-center bg-sky-950/90">
                             <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
                                 <h3 class="mb-4 text-lg font-semibold text-gray-900">Update Password</h3>
                                 <button @click="showPasswordModal = false" class="absolute p-2 text-gray-500 rounded-full top-4 right-4 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
@@ -80,12 +85,17 @@
                     <!-- Categories (Multiple Selection) -->
                     <div class="mt-4">
                         <x-input-label for="category_ids" :value="__('Categories')" />
-                        <select name="category_ids[]" id="category_ids" multiple class="block w-full mt-1 text-sm text-gray-900 border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm" required>
+                        <select name="category_ids[]" id="category_ids" multiple class="block w-full mt-1 text-sm text-gray-900 border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500" required>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ $user && $user->category->contains($category->id) ? 'selected' : '' }}>{{ $category->name }}</option>
                             @endforeach
                         </select>
                         <x-input-error :messages="$errors->get('category_ids')" class="mt-2" />
+                    </div>
+
+                    <div class="mt-4">
+                        <x-input-label for="address" :value="__('Address')" />
+                        <x-textarea name="address" id="address" class="w-full bg-white border-gray-200 rounded-md text-dark" :value="old('address', $user ? $user->address : '')"></x-textarea>
                     </div>
 
                     <!-- Is Admin Toggle -->
@@ -106,6 +116,9 @@
                     </div>
 
                     <div class="flex items-center justify-end mt-4">
+                        <a href="{{ route('admin.users') }}" class="p-2 text-white bg-red-600 rounded hover:bg-red-400">
+                            {{ __('Cancel') }}
+                        </a>
                         <x-primary-button class="ms-4">
                             {{ $user ? 'Update' : 'Register' }}
                         </x-primary-button>

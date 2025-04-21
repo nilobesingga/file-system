@@ -26,7 +26,7 @@ class InvestmentList extends Component
     public function render()
     {
         // Build query
-        $query = InvestmentStatistic::query()->with('user');
+        $query = InvestmentStatistic::query()->with('user','statement');
 
         // Apply sorting
         $query->orderBy('investor_code')
@@ -56,6 +56,10 @@ class InvestmentList extends Component
             $query->whereHas('user', function ($q) {
                 $q->where('name', $this->selectedInvestor);
             });
+        }
+
+        if (request('is_publish') !== null) {
+            $query->where('is_publish', request('is_publish'));
         }
 
         // Paginate results (10 per page)

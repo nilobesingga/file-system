@@ -64,6 +64,12 @@
             <div>
                 <label for="year" class="block mb-1 text-sm font-medium text-gray-700">Filter</label>
                 <div class="relative flex justify-start space-x-3">
+                    <select name="is_publish" id="is_publish" class="block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm appearance-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="" selected>All Status</option>
+                        <option value="0" {{ (request('is_publish') == 0 && request('is_publish') !== null) ? 'selected' : '' }}>Publish</option>
+                        <option value="1" {{ (request('is_publish') == 1 && request('is_publish') !== null) ? 'selected' : '' }}>Un Publish</option>
+
+                    </select>
                     <button type="submit" class="inline-flex items-center px-4 py-2 font-semibold text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -148,14 +154,24 @@
                                 </button>
                             </form>
                             <button type="button" onclick="openDetailModal({{ $stat->id }})" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md transition-all duration-200 bg-blue-600 hover:bg-blue-700">
-                                Detail View
+                                Details
                             </button>
-                            <a href="{{ route('statements.show',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customBlue hover:bg-customBlue/90' }}">
-                                {{ 'Preview' }}
-                            </a>
-                            <a href="{{ route('statements.pdf',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customGreen hover:bg-customBlue/90' }}">
-                                {{ 'Download' }}
-                            </a>
+                            @if ($stat->statement)
+                                <a href="{{ route('statements.show',$stat->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customBlue hover:bg-customBlue/90' }}">
+                                    {{ 'Preview' }}
+                                </a>
+                                <a href="{{ route('statements.pdf',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customGreen hover:bg-customBlue/90' }}">
+                                    {{ 'Download' }}
+                                </a>
+                            @else
+                                <form action="{{ route('admin.investments.generate', $stat->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-capLionGold hover:bg-capLionGold/90">
+                                        {{ __('Generate') }}
+                                    </button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -227,7 +243,7 @@
                                     <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.investor_name}</td>
                                     <td class="px-4 py-2 text-[11px] border border-gray-300">${(transaction.monthly_distribution ? 'YES' : 'NO')}</td>
                                     <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.bond_series}</td>
-                                    <td class="px-4 py-2 text-[11px] text-right border border-gray-300 ${(transaction.amount < 0 ? 'text-red-600' : 'text-green-600')}">${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                                    <td class="px-4 py-2 text-[11px] text-right border border-gray-300 ${(parseFloat(transaction.amount) > 0) ? 'text-green-600' : 'text-red-600'}">${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                                     <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.date}</td>
                                     <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.transaction}</td>
                                     <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.month}</td>

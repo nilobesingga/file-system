@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileHelper;
 use App\Imports\InvestorTransactionsImport;
+use App\Models\Category;
+use App\Models\Files;
 use App\Models\Investment;
 use App\Models\InvestmentStatistic;
+use App\Models\StatementSeries;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +17,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel as FacadesExcel;
+use Nette\DI\Definitions\Statement;
+
 class InvestementController extends Controller
 {
     public function index()
@@ -24,7 +30,7 @@ class InvestementController extends Controller
 
     public function investementList()
     {
-        $investments = InvestmentStatistic::with('user')->latest()->paginate(15);
+        $investments = InvestmentStatistic::with('user','statement')->latest()->paginate(15);
         $users = User::select('id', 'name')->get();
         return view('admin.investment-list', compact('investments', 'users'));
     }
@@ -39,7 +45,7 @@ class InvestementController extends Controller
             $statistic->update([
                 'is_publish' => ($statistic->is_publish == false) ? 1 : 0,
             ]);
-            return redirect()->route('admin.investment-list')->with('success', 'Publish status updated successfully.');
+            return redirect()->route('admin.investment-list')->with('success', (($statistic->is_publish == false) ? 'Unpublish ': 'Publish') .' status updated successfully.');
         } catch (\Exception $e) {
             return redirect()->route('admin.investment-list')->with('error', 'Error updating publish status: ' . $e->getMessage());
         }
@@ -354,6 +360,7 @@ class InvestementController extends Controller
     {
         // Fetch statement data (replace with your actual data retrieval logic)
         $statement = InvestmentStatistic::with(['user'])->findOrFail($id);
+        $ref = StatementSeries::where('statement_id', $id)->first();
         $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction')
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
@@ -391,14 +398,14 @@ class InvestementController extends Controller
         );
         $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
         $statementData = [
-            'statement_number' => $statement->statement_number ?? 'CLP-25-012',
-            'date' => $statement->date ?? '05 Mar 2025',
-            'customer_id' => $statement->user->code ?? 'GURUSD',
-            'customer_name' => $statement->user->name ?? 'Gurcan Gurel',
-            'address' => $statement->user->address ?? 'Kucukbebek Dere Clkmazi 11/3, 34433 Bebek/Istanbul, Turkey',
+            'statement_number' => $ref->statement_no ?? '',
+            'date' => date('d M Y'),
+            'customer_id' => $statement->user->code ?? '',
+            'customer_name' => $statement->user->name ?? '',
+            'address' => $statement->user->address ?? '',
             'bonds_subscribed' => $statement->number_of_bonds ?? 0,
             'total_amount_subscribed' => $statement->capital ?? 0.00,
-            'bond_name' => $statement->bond_name ?? 'Sky Hybrid SA Ltd Bonds Series 001',
+            'bond_name' => $ref->bond_name ?? '',
             'period_distribution' => $statement->month ." ". $statement->year ." / Monthly" ?? '',
             'statement_period' => $statement_period ?? '',
             'transactions' => $transact ?? [],
@@ -408,9 +415,10 @@ class InvestementController extends Controller
         return view('admin.statements', compact('statementData'));
     }
 
-    public function pdf($id)
+    public function pdf($id, $return = false)
     {
         $statement = InvestmentStatistic::with(['user'])->findOrFail($id);
+        $ref = StatementSeries::where('statement_id', $id)->first();
         $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction')
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
@@ -448,14 +456,14 @@ class InvestementController extends Controller
         );
         $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
         $statementData = [
-            'statement_number' => $statement->statement_number ?? 'CLP-25-012',
-            'date' => $statement->date ?? '05 Mar 2025',
-            'customer_id' => $statement->user->code ?? 'GURUSD',
-            'customer_name' => $statement->user->name ?? 'Gurcan Gurel',
-            'address' => $statement->user->address ?? 'Kucukbebek Dere Clkmazi 11/3, 34433 Bebek/Istanbul, Turkey',
+            'statement_number' => $ref->statement_no ?? '',
+            'date' => date('d M Y'),
+            'customer_id' => $statement->user->code ?? '',
+            'customer_name' => $statement->user->name ?? '',
+            'address' => $statement->user->address ?? '',
             'bonds_subscribed' => $statement->number_of_bonds ?? 0,
             'total_amount_subscribed' => $statement->capital ?? 0.00,
-            'bond_name' => $statement->bond_name ?? 'Sky Hybrid SA Ltd Bonds Series 001',
+            'bond_name' => $ref->bond_name ?? '',
             'period_distribution' => $statement->month ." ". $statement->year ." / Monthly" ?? '',
             'statement_period' => $statement_period ?? '',
             'transactions' => $transact ?? [],
@@ -475,10 +483,16 @@ class InvestementController extends Controller
                 'isRemoteEnabled' => true,
                 'defaultFont' => 'helvetica',
             ]);
-
-        // Return the PDF as a download or stream
-        // return $pdf->stream('account-statement-' . $id . '.pdf');
-
+        if($return){
+            $filename = 'account-statement-' . $id . '-' . time() . '.pdf';
+            $folderPath = 'account-statement';
+            $fullPath = $folderPath . '/' . $filename;
+            Storage::disk('public')->put($fullPath, $pdf->output());
+            return [
+                'path' => $fullPath,
+                'name' => $filename
+            ];
+        }
         // For download instead of preview:
         return $pdf->download('account-statement-' . $id . '.pdf');
     }
@@ -499,5 +513,73 @@ class InvestementController extends Controller
         return response()->json([
             'transactions' => $transactions,
         ]);
+    }
+
+    public function generateStatement($id)
+    {
+        try{
+            DB::beginTransaction();
+            $statement = DB::table('investment_statistics')->where('id', $id)->first();
+            if (!$statement) {
+                return response()->json(['error' => 'Investment statistic not found.'], 404);
+            }
+            $user = User::where('code', $statement->investor_code)->first();
+            if (!$user) {
+                return response()->json(['error' => 'User not found.'], 404);
+            }
+            $reference = FileHelper::generateStatementRef();
+            $bond_name = "Sky Hybrid SA Ltd Bonds Series 001";
+
+            StatementSeries::where('statement_id', $id)->delete();
+
+            DB::table('statement_series')->insert([
+                'statement_id' => $id,
+                'statement_no' => $reference,
+                'investor_code' => $statement->investor_code,
+                'bond_name' => $bond_name,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $categoryId = 1;
+            $userId = $user->id;
+
+            $monthName = $statement->month;
+            $year = $statement->year;
+
+            $firstDay = "01" . " " . date('M',strtotime($monthName)) ." ". $year;
+            $date = Carbon::createFromFormat('F Y', "$monthName $year");
+            $lastDay = $date->endOfMonth()->toDateString();
+            // $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
+            $statement_period = date('Y-m-d',strtotime($lastDay));
+
+            $files = $this->pdf($id, true);
+            $path = $files['path'] ?? '';
+            if (!$path) {
+                return response()->json(['error' => 'Error generating PDF.'], 500);
+            }
+            $filename = $files['name'] ?? '';
+            if (!$filename) {
+                return response()->json(['error' => 'Error generating PDF.'], 500);
+            }
+            Files::create([
+                'name' => $filename,
+                'path' => $path,
+                'user_id' => $userId,
+                'category_id' => $categoryId,
+                'document_name' => $bond_name ?? '',
+                'statement_no' => $reference,
+                'statement_period' => $statement_period,
+                'number_of_bonds' => $statement->number_of_bonds,
+                'amount_subscribed' => $statement->capital,
+                'currency' => 'USD',
+                'created_by' => Auth::user()->id
+            ]);
+            DB::commit();
+            return redirect()->route('admin.investment-list')->with('success', 'Statement generated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.investment-list')->with('error', 'Error on generating statement: ' . $e->getMessage());
+        }
     }
 }
