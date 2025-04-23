@@ -117,8 +117,8 @@
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Code</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Name</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Month / Year</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Beginning Balance</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Assets</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital Gain/Loss</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Net Gain/Loss</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Fees</th>
@@ -135,8 +135,8 @@
                         <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->investor_code }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">{{ $stat->user->name }}</td>
                         <td class="px-4 py-2 text-[11px] lowercase border border-gray-300 text-nowrap first-letter:capitalize">{{ ucfirst(substr($stat->month, 0, 3)) . " " . $stat->year}}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->investor_assets, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->capital_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->capital_gain_loss, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] text-red-600 border border-gray-300 text-end">{{ number_format($stat->fees, 2) }}</td>
