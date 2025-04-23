@@ -196,7 +196,19 @@ class InvestementController extends Controller
         }
     }
 
-    private function calculateMonthlyStatistics(array $investorCodes)
+    public function reconciliation(){
+        $investorCodes = [
+            'ATLUSD',
+            'ENIUSD',
+            'ERMUSD',
+            'GURUSD',
+            'JAMUSD',
+            'KEMUSD'
+        ];
+        $this->calculateMonthlyStatistics($investorCodes);
+    }
+
+    public function calculateMonthlyStatistics(array $investorCodes)
     {
         // Loop through each investor code
         foreach ($investorCodes as $investorCode) {
@@ -209,12 +221,15 @@ class InvestementController extends Controller
             // Fetch all transactions for the investor, ordered chronologically
             $transactions = Investment::where('investor_code', $investorCode)
                 ->orderBy('date') // Ensure chronological order for cumulative calculations
+                ->whereNotIN('transaction_type', [
+                    Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                    Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                ])
                 ->get()
                 ->groupBy('year')
                 ->map(function ($yearGroup) {
                     return $yearGroup->groupBy('month');
                 });
-
             // Initialize cumulative values
             $cumulativeBalance = 0; // For ending_balance
             $cumulativeBonds = 0;   // For ending_bond
