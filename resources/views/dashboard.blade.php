@@ -35,6 +35,8 @@
                     </select>
                 </form>
             </div>
+            @endif
+
             <x-dashboard-widget
                 :recentUploadsCount="$recentUploadsCount"
                 :totalFiles="$totalFiles"
@@ -51,7 +53,6 @@
                 :hwlmd="$hwlmd"
             />
             <x-investment-widget :investorCode="$investor_code"/>
-            @endif
             <x-user-file-system-widget
                 :totalFiles="$totalFiles"
                 :unreadFilesCount="$newFiles"

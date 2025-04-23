@@ -70,6 +70,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/statements/{id}/pdf', [InvestementController::class, 'pdf'])->name('statements.pdf');
         Route::get('/investments/{id}/details', [InvestementController::class, 'details'])->name('investments.details');
         Route::patch('/investments/generate/{id}', [InvestementController::class, 'generateStatement'])->name('admin.investments.generate');
+        Route::post('/investments/send-notification/{id}', [InvestementController::class, 'sendNotification'])->name('admin.investments.send-notification');
     });
 });
 

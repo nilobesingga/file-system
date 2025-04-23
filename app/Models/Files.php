@@ -34,4 +34,10 @@ class Files extends Model
     {
         return $this->readers()->where('user_id', Auth::user()->id)->exists();
     }
+
+    public function statement()
+    {
+        return $this->hasMany(InvestmentStatistic::class, 'id', 'statement_id');
+    }
+
 }

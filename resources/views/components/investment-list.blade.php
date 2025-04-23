@@ -145,24 +145,42 @@
                         <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->number_of_bonds }}</td>
                         <td class="px-4 py-2 text-[11px] text-right border border-gray-300">{{ number_format($stat->ending_balance, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">
-                            <form action="{{ route('admin.investments.toggle-publish', $stat->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('PATCH')
-                                <input type="hidden" name="is_publish" value="{{ $stat->is_publish ? 0 : 1 }}">
-                                <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 {{ $stat->is_publish ? 'bg-red-600 hover:bg-red-700' : 'bg-customBlue hover:bg-customBlue/90' }}">
-                                    {{ __($stat->is_publish ? 'Unpublish' : 'Publish') }}
-                                </button>
-                            </form>
+
                             <button type="button" onclick="openDetailModal({{ $stat->id }})" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md transition-all duration-200 bg-blue-600 hover:bg-blue-700">
                                 Details
                             </button>
                             @if ($stat->statement)
+                                <form action="{{ route('admin.investments.generate', $stat->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-capLionGold hover:bg-capLionGold/90">
+                                        {{ __('Re-Generate') }}
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.investments.toggle-publish', $stat->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="is_publish" value="{{ $stat->is_publish ? 0 : 1 }}">
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 {{ $stat->is_publish ? 'bg-red-600 hover:bg-red-700' : 'bg-customBlue hover:bg-customBlue/90' }}">
+                                        {{ __($stat->is_publish ? 'Unpublish' : 'Publish') }}
+                                    </button>
+                                </form>
                                 <a href="{{ route('statements.show',$stat->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customBlue hover:bg-customBlue/90' }}">
                                     {{ 'Preview' }}
                                 </a>
                                 <a href="{{ route('statements.pdf',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customGreen hover:bg-customBlue/90' }}">
                                     {{ 'Download' }}
                                 </a>
+                                <form action="{{ route('admin.investments.send-notification', $stat->user_id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('POST')
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customRed hover:bg-customRed/90">
+                                        {{ __('Send Email') }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-1 size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                        </svg>
+                                    </button>
+                                </form>
                             @else
                                 <form action="{{ route('admin.investments.generate', $stat->id) }}" method="POST" class="inline">
                                     @csrf
