@@ -47,7 +47,14 @@ class InvestementController extends Controller
             $statistic->update([
                 'is_publish' => ($statistic->is_publish == false) ? 1 : 0,
             ]);
-            return redirect()->route('admin.investment-list')->with('success', (($statistic->is_publish == false) ? 'Unpublish ': 'Publish') .' status updated successfully.');
+            $filterParams = $request->only([
+                'investor_code',
+                'investor_name',
+                'selected_investor',
+                'year',
+                'month'
+            ]);
+            return redirect()->route('admin.investment-list',$filterParams)->with('success', (($statistic->is_publish == false) ? 'Unpublish ': 'Publish') .' status updated successfully.');
         } catch (\Exception $e) {
             return redirect()->route('admin.investment-list')->with('error', 'Error updating publish status: ' . $e->getMessage());
         }
@@ -543,7 +550,7 @@ class InvestementController extends Controller
         ]);
     }
 
-    public function generateStatement($id)
+    public function generateStatement(Request $request, $id)
     {
         try{
             DB::beginTransaction();
@@ -611,14 +618,22 @@ class InvestementController extends Controller
                 'created_by' => Auth::user()->id
             ]);
             DB::commit();
-            return redirect()->route('admin.investment-list')->with('success', 'Statement generated successfully.');
+            $filterParams = $request->only([
+                'investor_code',
+                'investor_name',
+                'selected_investor',
+                'year',
+                'month',
+                'is_publish'
+            ]);
+            return redirect()->route('admin.investment-list',$filterParams)->with('success', 'Statement generated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('admin.investment-list')->with('error', 'Error on generating statement: ' . $e->getMessage());
         }
     }
 
-    public function sendNotification($userId)
+    public function sendNotification(Request $request, $userId)
     {
         $user = User::where('id', $userId)->first();
         if (!$user) {
@@ -626,6 +641,14 @@ class InvestementController extends Controller
         }
         $portalUrl = url('/dashboard');
         $user->notify(new NewStatementNotification($portalUrl));
-        return redirect()->route('admin.investment-list')->with('success', 'Email notification sent to investor email successfully');
+        $filterParams = $request->only([
+            'investor_code',
+            'investor_name',
+            'selected_investor',
+            'year',
+            'month',
+            'is_publish'
+        ]);
+        return redirect()->route('admin.investment-list',$filterParams)->with('success', 'Email notification sent to investor email successfully');
     }
 }
