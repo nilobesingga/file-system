@@ -256,6 +256,7 @@ class InvestementController extends Controller
                     $cumulativeBonds += $bondChanges;
                     // Calculate other metrics
                     $investorAssets = $monthTransactions->sum('amount'); // Total transactions for the month
+                    $investor_assets = ($cumulativeBalance > 0) ? $cumulativeBalance : 0;
                     $cumulativeBalance += $investorAssets; // Update cumulative balance with total transactions
 
                     $cumulativeCapital += $monthlyCapital;
@@ -273,7 +274,7 @@ class InvestementController extends Controller
                             'user_id' => $user->id,
                             'investor_code' => $investorCode,
                             'capital' => $cumulativeCapital,
-                            'investor_assets' => $cumulativeBalance,
+                            'investor_assets' => $investor_assets,
                             'capital_gain_loss' => $monthlyCapitalGainLoss,
                             'monthly_net_gain_loss' => $monthlyNetGainLoss,
                             'monthly_net_percentage' => $monthlyNetPercentage,
@@ -394,8 +395,8 @@ class InvestementController extends Controller
         $transact['opening'][] = array(
             'date' => $firstDay,
             'transaction' => 'Opening Balance',
-            'amount' => 0.00,
-            'balance' => 0.00,
+            'amount' => $statement->investor_assets ?? 0.00,
+            'balance' => $statement->investor_assets ?? 0.00,
             'opening' => true
         );
         $balance = 0;
@@ -456,8 +457,8 @@ class InvestementController extends Controller
         $transact['opening'][] = array(
             'date' => $firstDay,
             'transaction' => 'Opening Balance',
-            'amount' => 0.00,
-            'balance' => 0.00,
+            'amount' => $statement->investor_assets ?? 0.00,
+            'balance' => $statement->investor_assets ?? 0.00,
             'opening' => true
         );
         $balance = 0;

@@ -38,7 +38,7 @@
                         },
                         {
                             label: "Investor Assets",
-                            data: @json($statistics->pluck('investor_assets')),
+                            data: @json($statistics->pluck('ending_balance')),
                             backgroundColor: 'rgb(34, 81, 142)',
                             yAxisID: 'y',
                         },
