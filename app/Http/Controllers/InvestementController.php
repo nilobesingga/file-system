@@ -6,10 +6,12 @@ use App\Helpers\FileHelper;
 use App\Imports\InvestorTransactionsImport;
 use App\Models\Category;
 use App\Models\Files;
+use App\Models\FileUser;
 use App\Models\Investment;
 use App\Models\InvestmentStatistic;
 use App\Models\StatementSeries;
 use App\Models\User;
+use App\Notifications\NewStatementNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -334,18 +336,20 @@ class InvestementController extends Controller
 
         if (is_numeric($value)) {
             try {
-                $baseDate = $use1904System
-                    ? \Carbon\Carbon::create(1903, 12, 31) // 1904 system
-                    : \Carbon\Carbon::create(1899, 12, 31); // 1900 system
-                $days = $use1904System ? (int)$value + 1462 : (int)$value;
-                return $baseDate->addDays($days)->toDateString();
+                $unixTimestamp = ($value - 25569) * 86400;
+                return gmdate("Y-m-d", $unixTimestamp);
+                // $baseDate = $use1904System
+                //     ? \Carbon\Carbon::create(1903, 12, 31) // 1904 system
+                //     : \Carbon\Carbon::create(1899, 12, 31); // 1900 system
+                // $days = $use1904System ? (int)$value + 1462 : (int)$value;
+                // return $baseDate->addDays($days)->toDateString();
             } catch (\Exception $e) {
                 return now()->toDateString();
             }
         }
 
         try {
-            return \Carbon\Carbon::createFromFormat('Y/m/d', $value)->toDateString();
+            return \Carbon\Carbon::createFromFormat('Y-m-d', $value)->toDateString();
         } catch (\Exception $e) {
             return now()->toDateString();
         }
@@ -365,6 +369,10 @@ class InvestementController extends Controller
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
                         ->where('year', $statement->year)
+                        ->whereNotIN('transaction_type', [
+                            Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                            Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                        ])
                         ->groupBy('date', 'transaction_type','transaction','amount')
                         ->get();
         $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
@@ -423,6 +431,10 @@ class InvestementController extends Controller
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
                         ->where('year', $statement->year)
+                        ->whereNotIN('transaction_type', [
+                            Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                            Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                        ])
                         ->groupBy('date', 'transaction_type','transaction','amount')
                         ->get();
         $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
@@ -562,6 +574,12 @@ class InvestementController extends Controller
             if (!$filename) {
                 return response()->json(['error' => 'Error generating PDF.'], 500);
             }
+
+            $files = Files::where('statement_id', $id)->first();
+            if ($files) {
+                Files::where('statement_id', $id)->where('id',$files->id)->delete();
+                FileUser::where('file_id', $files->id)->delete();
+            }
             Files::create([
                 'name' => $filename,
                 'path' => $path,
@@ -569,6 +587,7 @@ class InvestementController extends Controller
                 'category_id' => $categoryId,
                 'document_name' => $bond_name ?? '',
                 'statement_no' => $reference,
+                'statement_id' => $id,
                 'statement_period' => $statement_period,
                 'number_of_bonds' => $statement->number_of_bonds,
                 'amount_subscribed' => $statement->capital,
@@ -581,5 +600,16 @@ class InvestementController extends Controller
             DB::rollBack();
             return redirect()->route('admin.investment-list')->with('error', 'Error on generating statement: ' . $e->getMessage());
         }
+    }
+
+    public function sendNotification($userId)
+    {
+        $user = User::where('id', $userId)->first();
+        if (!$user) {
+            return redirect()->route('admin.investment-list')->with('error', 'User not found.');
+        }
+        $portalUrl = url('/dashboard');
+        $user->notify(new NewStatementNotification($portalUrl));
+        return redirect()->route('admin.investment-list')->with('success', 'Email notification sent to investor email successfully');
     }
 }

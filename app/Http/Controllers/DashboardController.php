@@ -25,7 +25,10 @@ class DashboardController extends Controller
         if (!$user) {
             return redirect()->route('login');
         }
-
+        $is_publish = [1];
+        if(Auth::user()->is_admin){
+            $is_publish = [0,1];
+        }
         $users = User::where('is_admin', 0)->get();
         // Ensure the user has the correct relationship
         $categoryIds = CategoryUser::select('category_id')->where('user_id',$user->id)->pluck('category_id')->toArray(); // FIXED: Use correct relationship
@@ -35,7 +38,11 @@ class DashboardController extends Controller
         $sortDirection = request('direction', 'desc');
 
         // Build query for fetching files
-        $filesQuery = Files::with('user', 'category')->where('is_delete',0)->whereIn('category_id', $categoryIds)->where('files.user_id',$user->id);
+        $filesQuery = Files::with('user', 'category')->where('is_delete',0)->whereIn('category_id', $categoryIds)->where('files.user_id',$user->id)
+                        ->leftJoin('investment_statistics', function ($join){
+                            $join->on('investment_statistics.id', '=', 'files.statement_id');
+                        })
+                        ->whereIN('investment_statistics.is_publish', $is_publish);
 
         // Sorting logic
         if ($sortBy === 'unread') {
@@ -65,24 +72,27 @@ class DashboardController extends Controller
 
         // Paginate results
         $files = $filesQuery->paginate(15);
-        $totalFiles = Files::whereIn('category_id', $categoryIds)->where('user_id',$user->id)->where('is_delete',0)->count();
+        $totalFiles = Files::whereIn('files.category_id', $categoryIds)
+                        ->leftJoin('investment_statistics', function ($join){
+                            $join->on('investment_statistics.id', '=', 'files.statement_id');
+                        })
+                        ->whereIN('investment_statistics.is_publish', $is_publish)
+                        ->where('files.user_id',$user->id)->where('files.is_delete',0)->count();
         $storageUsage = 0;
 
         // Count recent uploads (last 7 days)
-        $recentUploadsCount = Files::whereIn('category_id', $categoryIds)
-            ->where('user_id',$user->id)
-            ->where('is_delete',0)
-            ->where('created_at', '>=', now()->subDays(7))
+        $recentUploadsCount = Files::whereIn('files.category_id', $categoryIds)
+            ->leftJoin('investment_statistics', function ($join){
+                $join->on('investment_statistics.id', '=', 'files.statement_id');
+            })
+            ->whereIN('investment_statistics.is_publish', $is_publish)
+            ->where('files.user_id',$user->id)
+            ->where('files.is_delete',0)
+            ->where('files.created_at', '>=', now()->subDays(7))
             ->count();
 
         // Count new files uploaded today
-        $newFiles = \App\Helpers\FileHelper::getNotication();
-
-        // $newFiles = Files::whereIn('category_id', $categoryIds)
-        //     ->where('user_id',$user->id)
-        //     ->where('is_delete',0)
-        //     ->where('created_at', '>=', now()->startOfDay())
-        //     ->count();
+        $newFiles = ($totalFiles > 0) ? \App\Helpers\FileHelper::getNotication() : 0;
 
         // Get all categories
         $category = Category::whereIn('id',$categoryIds)->get();
@@ -128,12 +138,13 @@ class DashboardController extends Controller
         $monthlyBonds = array_values($monthlyBonds);
         $labels = array_values($labels);
         $investor_code = $user->code;
+
         $netPerformance = InvestmentStatistic::where('investor_code', $user->code)
-                            ->where('is_publish', 1)
+                            ->whereIN('is_publish', $is_publish)
                             ->sum('monthly_net_gain_loss');
         $accumilate = InvestmentStatistic::select('capital','monthly_net_percentage','number_of_bonds')
                             ->where('investor_code', $user->code)
-                            ->where('is_publish', 1)
+                            ->whereIN('is_publish', $is_publish)
                             ->orderBy('year')
                             ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
                             ->first();
@@ -151,7 +162,7 @@ class DashboardController extends Controller
                                 })
                                 ->where('investment.investor_code', $user->code)
                                 ->where('investment.transaction_type', Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION)
-                                ->where('investment_statistics.is_publish', 1)
+                                ->whereIN('investment_statistics.is_publish', $is_publish)
                                 ->orderBy('investment.year')
                                 ->orderByRaw("FIELD(investment.month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
                                 ->pluck('amount')
@@ -165,7 +176,7 @@ class DashboardController extends Controller
                     })
                     ->where('investment.investor_code', $user->code)
                     ->where('investment.transaction_type', Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION)
-                    ->where('investment_statistics.is_publish', 1)
+                    ->whereIN('investment_statistics.is_publish', $is_publish)
                     ->orderBy('investment.year')
                     ->orderByRaw("FIELD(investment.month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
                     ->pluck('amount')
