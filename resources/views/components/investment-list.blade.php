@@ -153,6 +153,24 @@
                                 <form action="{{ route('admin.investments.generate', $stat->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
+                                    @if(request()->has('is_publish') && request('is_publish') !== null)
+                                        <input type="hidden" name="is_publish" value="{{ request('is_publish') }}">
+                                    @endif
+                                    @if(request('investor_code'))
+                                    <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
                                     <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-capLionGold hover:bg-capLionGold/90">
                                         {{ __('Re-Generate') }}
                                     </button>
@@ -161,6 +179,21 @@
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="is_publish" value="{{ $stat->is_publish ? 0 : 1 }}">
+                                    @if(request('investor_code'))
+                                        <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
                                     <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 {{ $stat->is_publish ? 'bg-red-600 hover:bg-red-700' : 'bg-customBlue hover:bg-customBlue/90' }}">
                                         {{ __($stat->is_publish ? 'Unpublish' : 'Publish') }}
                                     </button>
@@ -174,6 +207,24 @@
                                 <form action="{{ route('admin.investments.send-notification', $stat->user_id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('POST')
+                                    @if(request()->has('is_publish') && request('is_publish') !== null)
+                                    <input type="hidden" name="is_publish" value="{{ request('is_publish') }}">
+                                    @endif
+                                    @if(request('investor_code'))
+                                    <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
                                     <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customRed hover:bg-customRed/90">
                                         {{ __('Send Email') }}
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-1 size-4">
@@ -185,6 +236,24 @@
                                 <form action="{{ route('admin.investments.generate', $stat->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
+                                    @if(request()->has('is_publish') && request('is_publish') !== null)
+                                    <input type="hidden" name="is_publish" value="{{ request('is_publish') }}">
+                                    @endif
+                                    @if(request('investor_code'))
+                                    <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
                                     <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-capLionGold hover:bg-capLionGold/90">
                                         {{ __('Generate') }}
                                     </button>
