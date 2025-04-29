@@ -69,24 +69,24 @@
                             @foreach ($trans as $rowIndex => $transaction)
                                 <tr class="{{ ($index == 'closing') ? 'bg-capLionBlue text-white' : (($loop->parent->index % 2 === 0) ? 'bg-white text-gray-900' : 'bg-gray-100 text-gray-900') }}">
                                     @if($rowIndex === 0)
-                                        <td class="px-2 py-1 text-[10px] font-semibold h-[3rem]" rowspan="{{ count($trans) }}">
+                                        <td class="px-1 py-1 text-start align-top text-[10px] font-semibold h-[2rem]" rowspan="{{ count($trans) }}">
                                             {{ str_pad($loop->parent->index + 1, 2, '0', STR_PAD_LEFT) }}
                                         </td>
-                                        <td class="px-2 py-1 text-[10px] font-semibold h-[3rem]" rowspan="{{ count($trans) }}">
+                                        <td class="px-2 py-1 text-[10px] font-semibold h-[2rem] text-start align-top" rowspan="{{ count($trans) }}">
                                             {{ $transaction['date'] }}
                                         </td>
                                     @endif
-                                    <td class="px-2 py-1 text-[10px] font-semibold h-[1rem]">
+                                    <td class="px-2 py-1 text-[10px] font-semibold h-[1rem] text-start align-top">
                                         {{ $transaction['transaction'] }}
                                     </td>
-                                    <td class="px-2 py-1 text-[10px] font-semibold text-right h-[1rem] {{ ($transaction['amount'] ?? 0) < 0 ? 'text-red-500' : '' }}">
+                                    <td class="px-2 py-1 text-[10px] font-semibold text-right h-[1rem] align-top {{ ($transaction['amount'] ?? 0) < 0 ? 'text-red-500' : '' }}">
                                         @if (isset($transaction['amount']) && $transaction['amount'] != 0)
                                             {{ number_format($transaction['amount'], 2) }}
                                         @else
                                             -
                                         @endif
                                     </td>
-                                    <td class="px-2 py-1 text-[10px] text-right font-semibold h-[1rem]">
+                                    <td class="px-2 py-1 text-[10px] text-right font-semibold h-[1rem] align-top">
                                         @if (isset($transaction['balance']) && $transaction['balance'] != 0)
                                             {{ number_format($transaction['balance'], 2) }}
                                         @else

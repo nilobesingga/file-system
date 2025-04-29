@@ -29,7 +29,7 @@
                         <option value="">Select Investor</option>
                         @foreach ($users as $user)
                             <option value="{{ $user->id }}" {{ $user->id == $user_id ? 'selected' : '' }}>
-                                {{ $user->name }}
+                                {{ $user->code . " - " .$user->name }}
                             </option>
                         @endforeach
                     </select>

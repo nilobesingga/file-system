@@ -1,14 +1,14 @@
 <x-app-layout>
     <div class="py-3">
         <div class="w-full mx-auto sm:px-6 lg:px-20">
-            <div class="p-7 overflow-hidden bg-white rounded-lg shadow-sm">
+            <div class="overflow-hidden bg-white rounded-lg shadow-sm p-7">
                 @if (session('success'))
                     <div class="mb-4 text-sm text-green-600">
                         {{ session('success') }}
                     </div>
                 @endif
                 <!-- Add New Users Button (Top Right) -->
-                <div class="flex justify-between items-start mb-2">
+                <div class="flex items-start justify-between mb-2">
                     <h3 class="mb-4 text-2xl font-semibold text-gray-900">Users</h3>
                     <a href="{{ route('admin.register') }}" class="inline-flex items-center px-5 py-1.5 leading-7 bg-customBlue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-customBlue/90 focus:bg-customBlue/90 active:bg-customBlue/90 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition ease-in-out duration-200">
                         Add New User
@@ -18,8 +18,10 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Code</th>
                                 <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Name</th>
                                 <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
+                                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Address</th>
                                 <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Categories</th>
                                 <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Is Admin</th>
                                 <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
@@ -28,8 +30,10 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach($users as $user)
                             <tr>
+                                <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $user->code }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $user->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{{ $user->email }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $user->address }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                                     @if($user->category->isNotEmpty())
                                         {{ $user->category->pluck('name')->implode(', ') }}
@@ -42,7 +46,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('admin.register.edit') }}?edit={{ $user->id }}" class="inline-flex items-center px-3 py-1 text-sm text-white bg-customBlue rounded-md hover:bg-customBlue/90">Edit</a>
+                                        <a href="{{ route('admin.register.edit') }}?edit={{ $user->id }}" class="inline-flex items-center px-3 py-1 text-sm text-white rounded-md bg-customBlue hover:bg-customBlue/90">Edit</a>
                                         <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')

@@ -63,7 +63,7 @@ class InvestmentList extends Component
         }
 
         // Paginate results (10 per page)
-        $statistics = $query->paginate(10);
+        $statistics = $query->paginate(15);
 
         // Append filter parameters to pagination links
         $statistics->appends(request()->only(['investor_code', 'investor_name', 'month', 'year', 'selected_investor']));

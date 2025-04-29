@@ -382,7 +382,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ read: checkbox.checked })
+            body: JSON.stringify({ read: checkbox.checked , user_id: {{ request('user_id') ?? Auth::user()->id }} })
         })
         .then(response => response.json())
         .then(data => {

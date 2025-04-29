@@ -89,19 +89,40 @@
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
-                            offset: 5, // Add some space between the bar/line and the label
+                            offset: 5,
                             formatter: (value, context) => {
                                 if (context.dataset.label === "Investor Assets") {
                                     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                                 } else if (context.dataset.label === 'Profit / Loss') {
                                     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-                                } else {
-                                    return value + '%'; // Format percentage with 2 decimals
+                                } else if (context.dataset.label === 'Return') {
+                                    return (Math.round(value * 10) / 10).toFixed(1) + '%';
                                 }
+                            },
+                            backgroundColor: (context) => {
+                                if (context.dataset.label === 'Return') {
+                                    return 'rgb(125, 211, 252)';
+                                }
+                                return null;
+                            },
+                            borderRadius: (context) => {
+                                if (context.dataset.label === 'Return') {
+                                    return 4;
+                                }
+                                return 0;
+                            },
+                            padding: (context) => {
+                                if (context.dataset.label === 'Return') {
+                                    return {top: 4, bottom: 4, left: 6, right: 6};
+                                }
+                                return 0;
                             },
                             color: (context) => {
                                 const value = context.dataset.data[context.dataIndex];
-                                return value < 0 ? '#ff0000' : '#000'; // Red if negative, black otherwise
+                                if (context.dataset.label === 'Return') {
+                                    return value < 0 ? '#ff0000' : '#000000';
+                                }
+                                return value < 0 ? '#ff0000' : '#000';
                             },
                             font: {
                                 weight: 'bold',
