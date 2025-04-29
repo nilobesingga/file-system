@@ -589,11 +589,11 @@ class InvestementController extends Controller
             $monthName = $statement->month;
             $year = $statement->year;
 
-            $firstDay = "01" . " " . date('M',strtotime($monthName)) ." ". $year;
-            $date = Carbon::createFromFormat('F Y', "$monthName $year");
-            $lastDay = $date->endOfMonth()->toDateString();
+            $statement_period = date('Y-m-d',strtotime("01" . " " . $monthName ." ". $year));
+            // $date = Carbon::createFromFormat('F Y', "$monthName $year");
+            // $lastDay = $date->endOfMonth()->toDateString();
             // $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
-            $statement_period = date('Y-m-d',strtotime($lastDay));
+            // $statement_period = date('Y-m-d',strtotime($lastDay));
 
             $files = $this->pdf($id, true);
             $path = $files['path'] ?? '';
