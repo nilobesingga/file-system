@@ -86,7 +86,7 @@
             text-align: right;
             padding-right: 10px;
             padding-bottom: 8px;
-            width: 40%;
+            width: 41%;
         }
         .bond-value {
             display: table-cell;
@@ -157,6 +157,7 @@
             padding: 8px;
             font-size: 10px;
             font-weight: 500;
+            vertical-align: top;
             /* height: 20px; */
         }
         .transactions-table td:nth-child(4),
@@ -321,7 +322,7 @@
                       @php $i = 1; @endphp
                         @forelse ($statementData['transactions'] ?? [] as $index => $trans)
                             @foreach ($trans as $rowIndex => $transaction)
-                                <tr style="{{ ($index == 'closing') == 'closing' ? 'background-color: #091935 !important; color : #fff !important;' : 'color: #111827;' }}">
+                                <tr style="{{ ($index == 'closing') ? 'background-color: #091935 !important; color: #fff !important;' : ($loop->parent->iteration % 2 == 0 ? 'background-color: #F3F4F6;' : '') }} color: #111827;">
                                     @if($rowIndex === 0)
                                         <td rowspan="{{ count($trans) }}">
                                             {{ str_pad($loop->parent->index + 1, 2, '0', STR_PAD_LEFT) }}

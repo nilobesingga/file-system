@@ -22,7 +22,7 @@
                     <select name="selected_investor" id="selected_investor" class="block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm appearance-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                         <option value="">All Investors</option>
                         @foreach ($investors as $investor)
-                            <option value="{{ $investor->name }}" {{ request('selected_investor') == $investor->name ? 'selected' : '' }}>{{ $investor->name }}</option>
+                            <option value="{{ $investor->name }}" {{ request('selected_investor') == $investor->name ? 'selected' : '' }}>{{ $investor->code . " - " .$investor->name }}</option>
                         @endforeach
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -120,10 +120,10 @@
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Beginning Balance</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital Gain/Loss</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Net Gain/Loss</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Fees</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Net Gain/Loss</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Payment Distribution</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Net Percentage</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Net Percentage</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Number of Bonds</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Ending Balance</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Action</th>
@@ -138,8 +138,8 @@
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->investor_assets, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->capital_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->capital_gain_loss, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] text-red-600 border border-gray-300 text-end">{{ number_format($stat->fees, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->payment_distribution < 0 ? 'text-red-600' : '' }}">{{ number_format($stat->payment_distribution, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_percentage < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_percentage, 2) }}%</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->number_of_bonds }}</td>

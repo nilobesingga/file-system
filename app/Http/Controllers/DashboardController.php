@@ -92,7 +92,13 @@ class DashboardController extends Controller
             ->count();
 
         // Count new files uploaded today
-        $newFiles = ($totalFiles > 0) ? \App\Helpers\FileHelper::getNotication() : 0;
+        // $newFiles = ($totalFiles > 0) ? \App\Helpers\FileHelper::getNotication() : 0;
+        $unreadFilesCount = Files::where('is_delete', 0)
+            ->where('user_id', $user->id)
+            ->whereDoesntHave('readers', function ($query) use($user) {
+            $query->where('user_id', $user->id);
+        });
+        $newFiles = $unreadFilesCount->count();
 
         // Get all categories
         $category = Category::whereIn('id',$categoryIds)->get();
@@ -148,8 +154,8 @@ class DashboardController extends Controller
                             ->orderBy('year')
                             ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
                             ->first();
-        $netPerformance = ($netPerformance) ? round(($netPerformance / $accumilate->capital) * 100) : 0;
-        $netYield = $accumilate->monthly_net_percentage ?? 0;
+        $netPerformance = ($netPerformance) ? number_format(($netPerformance / $accumilate->capital) * 100,1) : 0;
+        $netYield = ($accumilate && $accumilate->monthly_net_percentage != null) ? number_format($accumilate->monthly_net_percentage,1) : 0;
         $numberOfBonds = $accumilate->number_of_bonds ?? 0;
         $amountInvested = $accumilate->capital ?? 0;
         $user_id = $user->id;
@@ -207,19 +213,20 @@ class DashboardController extends Controller
 
     public function toggleRead(Request $request, Files $file)
     {
-        $user = Auth::user();
-        if (!$user) {
+        $user_id = request('user_id') ?? Auth::user()->id;
+
+        if (!$user_id) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
         $isRead = $request->input('read', true);
 
         if ($isRead) {
-            if (!$file->readers()->where('user_id', $user->id)->exists()) {
-                $file->readers()->attach($user->id, ['read_at' => now()]);
+            if (!$file->readers()->where('user_id', $user_id)->exists()) {
+                $file->readers()->attach($user_id, ['read_at' => now()]);
             }
         } else {
-            $file->readers()->detach($user->id);
+            $file->readers()->detach($user_id);
         }
 
         return response()->json([

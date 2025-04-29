@@ -398,15 +398,15 @@ class InvestementController extends Controller
                         ])
                         ->groupBy('date', 'transaction_type','transaction','amount')
                         ->get();
-        $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
+        $firstDay =  date('d M Y',strtotime("01" . " " .$statement->month ." ". $statement->year));
         $transact['opening'][] = array(
             'date' => $firstDay,
             'transaction' => 'Opening Balance',
-            'amount' => $statement->investor_assets ?? 0.00,
+            'amount' => 0,
             'balance' => $statement->investor_assets ?? 0.00,
             'opening' => true
         );
-        $balance = 0;
+        $balance = $statement->investor_assets ?? 0;
         foreach ($transactions as $trans) {
             $xdata = $trans->toArray();
             $xdata['date'] = date('d M Y', strtotime($trans->date));
@@ -415,19 +415,21 @@ class InvestementController extends Controller
             $xdata['balance'] = $balance;
             $transact[$trans->date][] = $xdata;
         }
-        $monthName = $statement->month;
-        $year = $statement->year;
-        $date = Carbon::createFromFormat('F Y', "$monthName $year");
+        //get the last key of the array $transact
+        $lastKey = array_key_last($transact);
+        // $monthName = $statement->month;
+        // $year = $statement->year;
+        // $date = Carbon::createFromFormat('F Y', $lastKey);
         // Get the last day of the month
-        $lastDay = $date->endOfMonth()->toDateString();
+        // $lastDay = $date->endOfMonth()->toDateString();
         $transact['closing'][] = array(
-            'date' => date('d M Y',strtotime($lastDay)),
+            'date' => date('d M Y',strtotime($lastKey)),
             'transaction' => 'Closing Balance',
             'amount' => "0",
             'balance' => $statement->ending_balance,
             'closing' => true
         );
-        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
+        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastKey));
         $statementData = [
             'statement_number' => $ref->statement_no ?? '',
             'date' => date('d M Y'),
@@ -460,15 +462,15 @@ class InvestementController extends Controller
                         ])
                         ->groupBy('date', 'transaction_type','transaction','amount')
                         ->get();
-        $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
+        $firstDay = date('d M Y',strtotime("01" . " ".$statement->month ." ". $statement->year));
         $transact['opening'][] = array(
             'date' => $firstDay,
             'transaction' => 'Opening Balance',
-            'amount' => $statement->investor_assets ?? 0.00,
+            'amount' => 0,
             'balance' => $statement->investor_assets ?? 0.00,
             'opening' => true
         );
-        $balance = 0;
+        $balance = $statement->investor_assets ?? 0;
         foreach ($transactions as $trans) {
             $xdata = $trans->toArray();
             $xdata['date'] = date('d M Y', strtotime($trans->date));
@@ -477,19 +479,24 @@ class InvestementController extends Controller
             $xdata['balance'] = $balance;
             $transact[$trans->date][] = $xdata;
         }
-        $monthName = $statement->month;
-        $year = $statement->year;
-        $date = Carbon::createFromFormat('F Y', "$monthName $year");
+        //get the last key of the array $transact
+        $lastKey = array_key_last($transact);
+        //get the last value of the array $transact
+        // $lastValue = $transact[$lastKey];
+        // dd($lastValue);
+        // $monthName = $statement->month;
+        // $year = $statement->year;
+        // $date = Carbon::createFromFormat('F Y', $lastKey);
         // Get the last day of the month
-        $lastDay = $date->endOfMonth()->toDateString();
+        // $lastDay = $date->endOfMonth()->toDateString();
         $transact['closing'][] = array(
-            'date' => date('d M Y',strtotime($lastDay)),
+            'date' => date('d M Y',strtotime($lastKey)),
             'transaction' => 'Closing Balance',
             'amount' => "0",
             'balance' => $statement->ending_balance,
             'closing' => true
         );
-        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
+        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastKey));
         $statementData = [
             'statement_number' => $ref->statement_no ?? '',
             'date' => date('d M Y'),
