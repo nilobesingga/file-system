@@ -51,7 +51,7 @@
         }
         .divider {
             border-top: 1px solid #111827;
-            margin-top: 15px;
+            margin-top: 20px;
             margin-bottom: 15px;
         }
         .customer-section {
@@ -293,8 +293,12 @@
                         <div class="bond-value">{{ $statementData['bond_name'] }}</div>
                     </div>
                     <div class="bond-row">
-                        <div class="bond-label">Period / Distribution:</div>
+                        <div class="bond-label">Period:</div>
                         <div class="bond-value">{{ $statementData['period_distribution'] }}</div>
+                    </div>
+                    <div class="bond-row">
+                        <div class="bond-label">Monthly Distribution:</div>
+                        <div class="bond-value">{{ $statementData['monthly_distribution'] }}</div>
                     </div>
                 </div>
             </div>
