@@ -6,10 +6,12 @@ use App\Helpers\FileHelper;
 use App\Imports\InvestorTransactionsImport;
 use App\Models\Category;
 use App\Models\Files;
+use App\Models\FileUser;
 use App\Models\Investment;
 use App\Models\InvestmentStatistic;
 use App\Models\StatementSeries;
 use App\Models\User;
+use App\Notifications\NewStatementNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +47,14 @@ class InvestementController extends Controller
             $statistic->update([
                 'is_publish' => ($statistic->is_publish == false) ? 1 : 0,
             ]);
-            return redirect()->route('admin.investment-list')->with('success', (($statistic->is_publish == false) ? 'Unpublish ': 'Publish') .' status updated successfully.');
+            $filterParams = $request->only([
+                'investor_code',
+                'investor_name',
+                'selected_investor',
+                'year',
+                'month'
+            ]);
+            return redirect()->route('admin.investment-list',$filterParams)->with('success', (($statistic->is_publish == false) ? 'Unpublish ': 'Publish') .' status updated successfully.');
         } catch (\Exception $e) {
             return redirect()->route('admin.investment-list')->with('error', 'Error updating publish status: ' . $e->getMessage());
         }
@@ -194,7 +203,19 @@ class InvestementController extends Controller
         }
     }
 
-    private function calculateMonthlyStatistics(array $investorCodes)
+    public function reconciliation(){
+        $investorCodes = [
+            'ATLUSD',
+            'ENIUSD',
+            'ERMUSD',
+            'GURUSD',
+            'JAMUSD',
+            'KEMUSD'
+        ];
+        $this->calculateMonthlyStatistics($investorCodes);
+    }
+
+    public function calculateMonthlyStatistics(array $investorCodes)
     {
         // Loop through each investor code
         foreach ($investorCodes as $investorCode) {
@@ -207,12 +228,15 @@ class InvestementController extends Controller
             // Fetch all transactions for the investor, ordered chronologically
             $transactions = Investment::where('investor_code', $investorCode)
                 ->orderBy('date') // Ensure chronological order for cumulative calculations
+                ->whereNotIN('transaction_type', [
+                    Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                    Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                ])
                 ->get()
                 ->groupBy('year')
                 ->map(function ($yearGroup) {
                     return $yearGroup->groupBy('month');
                 });
-
             // Initialize cumulative values
             $cumulativeBalance = 0; // For ending_balance
             $cumulativeBonds = 0;   // For ending_bond
@@ -239,6 +263,7 @@ class InvestementController extends Controller
                     $cumulativeBonds += $bondChanges;
                     // Calculate other metrics
                     $investorAssets = $monthTransactions->sum('amount'); // Total transactions for the month
+                    $investor_assets = ($cumulativeBalance > 0) ? $cumulativeBalance : 0;
                     $cumulativeBalance += $investorAssets; // Update cumulative balance with total transactions
 
                     $cumulativeCapital += $monthlyCapital;
@@ -256,7 +281,7 @@ class InvestementController extends Controller
                             'user_id' => $user->id,
                             'investor_code' => $investorCode,
                             'capital' => $cumulativeCapital,
-                            'investor_assets' => $cumulativeBalance,
+                            'investor_assets' => $investor_assets,
                             'capital_gain_loss' => $monthlyCapitalGainLoss,
                             'monthly_net_gain_loss' => $monthlyNetGainLoss,
                             'monthly_net_percentage' => $monthlyNetPercentage,
@@ -334,18 +359,20 @@ class InvestementController extends Controller
 
         if (is_numeric($value)) {
             try {
-                $baseDate = $use1904System
-                    ? \Carbon\Carbon::create(1903, 12, 31) // 1904 system
-                    : \Carbon\Carbon::create(1899, 12, 31); // 1900 system
-                $days = $use1904System ? (int)$value + 1462 : (int)$value;
-                return $baseDate->addDays($days)->toDateString();
+                $unixTimestamp = ($value - 25569) * 86400;
+                return gmdate("Y-m-d", $unixTimestamp);
+                // $baseDate = $use1904System
+                //     ? \Carbon\Carbon::create(1903, 12, 31) // 1904 system
+                //     : \Carbon\Carbon::create(1899, 12, 31); // 1900 system
+                // $days = $use1904System ? (int)$value + 1462 : (int)$value;
+                // return $baseDate->addDays($days)->toDateString();
             } catch (\Exception $e) {
                 return now()->toDateString();
             }
         }
 
         try {
-            return \Carbon\Carbon::createFromFormat('Y/m/d', $value)->toDateString();
+            return \Carbon\Carbon::createFromFormat('Y-m-d', $value)->toDateString();
         } catch (\Exception $e) {
             return now()->toDateString();
         }
@@ -365,17 +392,21 @@ class InvestementController extends Controller
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
                         ->where('year', $statement->year)
+                        ->whereNotIN('transaction_type', [
+                            Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                            Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                        ])
                         ->groupBy('date', 'transaction_type','transaction','amount')
                         ->get();
-        $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
+        $firstDay =  date('d M Y',strtotime("01" . " " .$statement->month ." ". $statement->year));
         $transact['opening'][] = array(
             'date' => $firstDay,
             'transaction' => 'Opening Balance',
-            'amount' => 0.00,
-            'balance' => 0.00,
+            'amount' => 0,
+            'balance' => $statement->investor_assets ?? 0.00,
             'opening' => true
         );
-        $balance = 0;
+        $balance = $statement->investor_assets ?? 0;
         foreach ($transactions as $trans) {
             $xdata = $trans->toArray();
             $xdata['date'] = date('d M Y', strtotime($trans->date));
@@ -384,19 +415,21 @@ class InvestementController extends Controller
             $xdata['balance'] = $balance;
             $transact[$trans->date][] = $xdata;
         }
-        $monthName = $statement->month;
-        $year = $statement->year;
-        $date = Carbon::createFromFormat('F Y', "$monthName $year");
+        //get the last key of the array $transact
+        $lastKey = array_key_last($transact);
+        // $monthName = $statement->month;
+        // $year = $statement->year;
+        // $date = Carbon::createFromFormat('F Y', $lastKey);
         // Get the last day of the month
-        $lastDay = $date->endOfMonth()->toDateString();
+        // $lastDay = $date->endOfMonth()->toDateString();
         $transact['closing'][] = array(
-            'date' => date('d M Y',strtotime($lastDay)),
+            'date' => date('d M Y',strtotime($lastKey)),
             'transaction' => 'Closing Balance',
             'amount' => "0",
             'balance' => $statement->ending_balance,
             'closing' => true
         );
-        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
+        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastKey));
         $statementData = [
             'statement_number' => $ref->statement_no ?? '',
             'date' => date('d M Y'),
@@ -406,7 +439,8 @@ class InvestementController extends Controller
             'bonds_subscribed' => $statement->number_of_bonds ?? 0,
             'total_amount_subscribed' => $statement->capital ?? 0.00,
             'bond_name' => $ref->bond_name ?? '',
-            'period_distribution' => $statement->month ." ". $statement->year ." / Monthly" ?? '',
+            'period_distribution' => $statement->month ." ". $statement->year ?? '',
+            'monthly_distribution' => ($statement->payment_distribution != 0) ? 'Yes' :  'No',
             'statement_period' => $statement_period ?? '',
             'transactions' => $transact ?? [],
             'gross_capital_gain' => $statement->capital_gain_loss ?? 0.00,
@@ -423,17 +457,21 @@ class InvestementController extends Controller
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
                         ->where('year', $statement->year)
+                        ->whereNotIN('transaction_type', [
+                            Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                            Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                        ])
                         ->groupBy('date', 'transaction_type','transaction','amount')
                         ->get();
-        $firstDay = "01" . " " . date('M',strtotime($statement->month)) ." ". $statement->year;
+        $firstDay = date('d M Y',strtotime("01" . " ".$statement->month ." ". $statement->year));
         $transact['opening'][] = array(
             'date' => $firstDay,
             'transaction' => 'Opening Balance',
-            'amount' => 0.00,
-            'balance' => 0.00,
+            'amount' => 0,
+            'balance' => $statement->investor_assets ?? 0.00,
             'opening' => true
         );
-        $balance = 0;
+        $balance = $statement->investor_assets ?? 0;
         foreach ($transactions as $trans) {
             $xdata = $trans->toArray();
             $xdata['date'] = date('d M Y', strtotime($trans->date));
@@ -442,19 +480,24 @@ class InvestementController extends Controller
             $xdata['balance'] = $balance;
             $transact[$trans->date][] = $xdata;
         }
-        $monthName = $statement->month;
-        $year = $statement->year;
-        $date = Carbon::createFromFormat('F Y', "$monthName $year");
+        //get the last key of the array $transact
+        $lastKey = array_key_last($transact);
+        //get the last value of the array $transact
+        // $lastValue = $transact[$lastKey];
+        // dd($lastValue);
+        // $monthName = $statement->month;
+        // $year = $statement->year;
+        // $date = Carbon::createFromFormat('F Y', $lastKey);
         // Get the last day of the month
-        $lastDay = $date->endOfMonth()->toDateString();
+        // $lastDay = $date->endOfMonth()->toDateString();
         $transact['closing'][] = array(
-            'date' => date('d M Y',strtotime($lastDay)),
+            'date' => date('d M Y',strtotime($lastKey)),
             'transaction' => 'Closing Balance',
             'amount' => "0",
             'balance' => $statement->ending_balance,
             'closing' => true
         );
-        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
+        $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastKey));
         $statementData = [
             'statement_number' => $ref->statement_no ?? '',
             'date' => date('d M Y'),
@@ -464,7 +507,8 @@ class InvestementController extends Controller
             'bonds_subscribed' => $statement->number_of_bonds ?? 0,
             'total_amount_subscribed' => $statement->capital ?? 0.00,
             'bond_name' => $ref->bond_name ?? '',
-            'period_distribution' => $statement->month ." ". $statement->year ." / Monthly" ?? '',
+            'period_distribution' => $statement->month ." ". $statement->year ?? '',
+            'monthly_distribution' => ($statement->payment_distribution != 0) ? 'Yes' :  'No',
             'statement_period' => $statement_period ?? '',
             'transactions' => $transact ?? [],
             'gross_capital_gain' => $statement->capital_gain_loss ?? 0.00,
@@ -515,7 +559,7 @@ class InvestementController extends Controller
         ]);
     }
 
-    public function generateStatement($id)
+    public function generateStatement(Request $request, $id)
     {
         try{
             DB::beginTransaction();
@@ -547,11 +591,11 @@ class InvestementController extends Controller
             $monthName = $statement->month;
             $year = $statement->year;
 
-            $firstDay = "01" . " " . date('M',strtotime($monthName)) ." ". $year;
-            $date = Carbon::createFromFormat('F Y', "$monthName $year");
-            $lastDay = $date->endOfMonth()->toDateString();
+            $statement_period = date('Y-m-d',strtotime("01" . " " . $monthName ." ". $year));
+            // $date = Carbon::createFromFormat('F Y', "$monthName $year");
+            // $lastDay = $date->endOfMonth()->toDateString();
             // $statement_period = date('d M Y',strtotime($firstDay)). " - " .date('d M Y',strtotime($lastDay));
-            $statement_period = date('Y-m-d',strtotime($lastDay));
+            // $statement_period = date('Y-m-d',strtotime($lastDay));
 
             $files = $this->pdf($id, true);
             $path = $files['path'] ?? '';
@@ -562,6 +606,12 @@ class InvestementController extends Controller
             if (!$filename) {
                 return response()->json(['error' => 'Error generating PDF.'], 500);
             }
+
+            $files = Files::where('statement_id', $id)->first();
+            if ($files) {
+                Files::where('statement_id', $id)->where('id',$files->id)->delete();
+                FileUser::where('file_id', $files->id)->delete();
+            }
             Files::create([
                 'name' => $filename,
                 'path' => $path,
@@ -569,6 +619,7 @@ class InvestementController extends Controller
                 'category_id' => $categoryId,
                 'document_name' => $bond_name ?? '',
                 'statement_no' => $reference,
+                'statement_id' => $id,
                 'statement_period' => $statement_period,
                 'number_of_bonds' => $statement->number_of_bonds,
                 'amount_subscribed' => $statement->capital,
@@ -576,10 +627,37 @@ class InvestementController extends Controller
                 'created_by' => Auth::user()->id
             ]);
             DB::commit();
-            return redirect()->route('admin.investment-list')->with('success', 'Statement generated successfully.');
+            $filterParams = $request->only([
+                'investor_code',
+                'investor_name',
+                'selected_investor',
+                'year',
+                'month',
+                'is_publish'
+            ]);
+            return redirect()->route('admin.investment-list',$filterParams)->with('success', 'Statement generated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('admin.investment-list')->with('error', 'Error on generating statement: ' . $e->getMessage());
         }
+    }
+
+    public function sendNotification(Request $request, $userId)
+    {
+        $user = User::where('id', $userId)->first();
+        if (!$user) {
+            return redirect()->route('admin.investment-list')->with('error', 'User not found.');
+        }
+        $portalUrl = url('/dashboard');
+        $user->notify(new NewStatementNotification($portalUrl));
+        $filterParams = $request->only([
+            'investor_code',
+            'investor_name',
+            'selected_investor',
+            'year',
+            'month',
+            'is_publish'
+        ]);
+        return redirect()->route('admin.investment-list',$filterParams)->with('success', 'Email notification sent to investor email successfully');
     }
 }

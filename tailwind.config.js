@@ -11,7 +11,8 @@ module.exports = {
                 customBlue: '#22518E',
                 customGreen: '#11CABE',
                 capLionBlue: '#091935',
-                capLionGold: '#A57D2D'
+                capLionGold: '#A57D2D',
+                customRed: '#ed2323'
             },
             fontFamily: {
                 sans: ['Figtree', 'sans-serif'],

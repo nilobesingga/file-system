@@ -28,17 +28,19 @@
                 <div class="grid grid-cols-[2fr_3fr] gap-x-2">
                     <!-- Labels Column (Aligned Right) -->
                     <div class="text-[10px] text-gray-600 text-right">
-                        <p class="mb-3">Number of Bonds Subscribed:</p>
-                        <p class="mb-3">Total Amount Subscribed (USD):</p>
-                        <p class="mb-3">Bond Name:</p>
-                        <p>Period / Distribution:</p>
+                        <p class="mb-2">Number of Bonds Subscribed:</p>
+                        <p class="mb-2">Total Amount Subscribed (USD):</p>
+                        <p class="mb-2">Bond Name:</p>
+                        <p class="mb-2">Period:</p>
+                        <p>Monthly Distribution:</p>
                     </div>
                     <!-- Values Column (Aligned Left) -->
                     <div class="text-[12px] font-extrabold text-gray-900 text-left">
-                        <p class="mb-2">{{ $statementData['bonds_subscribed'] ?? 'N/A' }}</p>
-                        <p class="mb-2">{{ number_format($statementData['total_amount_subscribed'] ?? 0, 2) }}</p>
-                        <p class="mb-2">{{ $statementData['bond_name'] ?? 'N/A' }}</p>
-                        <p>{{ $statementData['period_distribution'] ?? 'N/A' }}</p>
+                        <p class="mb-1">{{ $statementData['bonds_subscribed'] ?? 'N/A' }}</p>
+                        <p class="mb-1">{{ number_format($statementData['total_amount_subscribed'] ?? 0, 2) }}</p>
+                        <p class="mb-1">{{ $statementData['bond_name'] ?? 'N/A' }}</p>
+                        <p class="mb-1">{{ $statementData['period_distribution'] ?? 'N/A' }}</p>
+                        <p>{{ $statementData['monthly_distribution'] ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>
@@ -69,24 +71,24 @@
                             @foreach ($trans as $rowIndex => $transaction)
                                 <tr class="{{ ($index == 'closing') ? 'bg-capLionBlue text-white' : (($loop->parent->index % 2 === 0) ? 'bg-white text-gray-900' : 'bg-gray-100 text-gray-900') }}">
                                     @if($rowIndex === 0)
-                                        <td class="px-2 py-1 text-[10px] font-semibold h-[3rem]" rowspan="{{ count($trans) }}">
+                                        <td class="px-1 py-1 text-start align-top text-[10px] font-semibold h-[2rem]" rowspan="{{ count($trans) }}">
                                             {{ str_pad($loop->parent->index + 1, 2, '0', STR_PAD_LEFT) }}
                                         </td>
-                                        <td class="px-2 py-1 text-[10px] font-semibold h-[3rem]" rowspan="{{ count($trans) }}">
+                                        <td class="px-2 py-1 text-[10px] font-semibold h-[2rem] text-start align-top" rowspan="{{ count($trans) }}">
                                             {{ $transaction['date'] }}
                                         </td>
                                     @endif
-                                    <td class="px-2 py-1 text-[10px] font-semibold h-[1rem]">
+                                    <td class="px-2 py-1 text-[10px] font-semibold h-[1rem] text-start align-top">
                                         {{ $transaction['transaction'] }}
                                     </td>
-                                    <td class="px-2 py-1 text-[10px] font-semibold text-right h-[1rem] {{ ($transaction['amount'] ?? 0) < 0 ? 'text-red-500' : '' }}">
+                                    <td class="px-2 py-1 text-[10px] font-semibold text-right h-[1rem] align-top {{ ($transaction['amount'] ?? 0) < 0 ? 'text-red-500' : '' }}">
                                         @if (isset($transaction['amount']) && $transaction['amount'] != 0)
                                             {{ number_format($transaction['amount'], 2) }}
                                         @else
                                             -
                                         @endif
                                     </td>
-                                    <td class="px-2 py-1 text-[10px] text-right font-semibold h-[1rem]">
+                                    <td class="px-2 py-1 text-[10px] text-right font-semibold h-[1rem] align-top">
                                         @if (isset($transaction['balance']) && $transaction['balance'] != 0)
                                             {{ number_format($transaction['balance'], 2) }}
                                         @else

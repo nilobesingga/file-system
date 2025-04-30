@@ -29,12 +29,14 @@
                         <option value="">Select Investor</option>
                         @foreach ($users as $user)
                             <option value="{{ $user->id }}" {{ $user->id == $user_id ? 'selected' : '' }}>
-                                {{ $user->name }}
+                                {{ $user->code . " - " .$user->name }}
                             </option>
                         @endforeach
                     </select>
                 </form>
             </div>
+            @endif
+
             <x-dashboard-widget
                 :recentUploadsCount="$recentUploadsCount"
                 :totalFiles="$totalFiles"
@@ -51,7 +53,6 @@
                 :hwlmd="$hwlmd"
             />
             <x-investment-widget :investorCode="$investor_code"/>
-            @endif
             <x-user-file-system-widget
                 :totalFiles="$totalFiles"
                 :unreadFilesCount="$newFiles"

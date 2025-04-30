@@ -22,7 +22,7 @@
                     <select name="selected_investor" id="selected_investor" class="block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm appearance-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                         <option value="">All Investors</option>
                         @foreach ($investors as $investor)
-                            <option value="{{ $investor->name }}" {{ request('selected_investor') == $investor->name ? 'selected' : '' }}>{{ $investor->name }}</option>
+                            <option value="{{ $investor->name }}" {{ request('selected_investor') == $investor->name ? 'selected' : '' }}>{{ $investor->code . " - " .$investor->name }}</option>
                         @endforeach
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -117,13 +117,13 @@
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Code</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Name</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Month / Year</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Beginning Balance</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Assets</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital Gain/Loss</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Net Gain/Loss</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Fees</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Net Gain/Loss</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Payment Distribution</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Monthly Net Percentage</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Net Percentage</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Number of Bonds</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Ending Balance</th>
                     <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Action</th>
@@ -135,38 +135,125 @@
                         <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->investor_code }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">{{ $stat->user->name }}</td>
                         <td class="px-4 py-2 text-[11px] lowercase border border-gray-300 text-nowrap first-letter:capitalize">{{ ucfirst(substr($stat->month, 0, 3)) . " " . $stat->year}}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->investor_assets, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->capital_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->capital_gain_loss, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] text-red-600 border border-gray-300 text-end">{{ number_format($stat->fees, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->payment_distribution < 0 ? 'text-red-600' : '' }}">{{ number_format($stat->payment_distribution, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_percentage < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_percentage, 2) }}%</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->number_of_bonds }}</td>
                         <td class="px-4 py-2 text-[11px] text-right border border-gray-300">{{ number_format($stat->ending_balance, 2) }}</td>
                         <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">
-                            <form action="{{ route('admin.investments.toggle-publish', $stat->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('PATCH')
-                                <input type="hidden" name="is_publish" value="{{ $stat->is_publish ? 0 : 1 }}">
-                                <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 {{ $stat->is_publish ? 'bg-red-600 hover:bg-red-700' : 'bg-customBlue hover:bg-customBlue/90' }}">
-                                    {{ __($stat->is_publish ? 'Unpublish' : 'Publish') }}
-                                </button>
-                            </form>
+
                             <button type="button" onclick="openDetailModal({{ $stat->id }})" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md transition-all duration-200 bg-blue-600 hover:bg-blue-700">
                                 Details
                             </button>
                             @if ($stat->statement)
+                                <form action="{{ route('admin.investments.generate', $stat->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    @if(request()->has('is_publish') && request('is_publish') !== null)
+                                        <input type="hidden" name="is_publish" value="{{ request('is_publish') }}">
+                                    @endif
+                                    @if(request('investor_code'))
+                                    <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-capLionGold hover:bg-capLionGold/90">
+                                        {{ __('Re-Generate') }}
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.investments.toggle-publish', $stat->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="is_publish" value="{{ $stat->is_publish ? 0 : 1 }}">
+                                    @if(request('investor_code'))
+                                        <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 {{ $stat->is_publish ? 'bg-red-600 hover:bg-red-700' : 'bg-customBlue hover:bg-customBlue/90' }}">
+                                        {{ __($stat->is_publish ? 'Unpublish' : 'Publish') }}
+                                    </button>
+                                </form>
                                 <a href="{{ route('statements.show',$stat->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customBlue hover:bg-customBlue/90' }}">
                                     {{ 'Preview' }}
                                 </a>
                                 <a href="{{ route('statements.pdf',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customGreen hover:bg-customBlue/90' }}">
                                     {{ 'Download' }}
                                 </a>
+                                <form action="{{ route('admin.investments.send-notification', $stat->user_id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('POST')
+                                    @if(request()->has('is_publish') && request('is_publish') !== null)
+                                    <input type="hidden" name="is_publish" value="{{ request('is_publish') }}">
+                                    @endif
+                                    @if(request('investor_code'))
+                                    <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customRed hover:bg-customRed/90">
+                                        {{ __('Send Email') }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-1 size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                        </svg>
+                                    </button>
+                                </form>
                             @else
                                 <form action="{{ route('admin.investments.generate', $stat->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
+                                    @if(request()->has('is_publish') && request('is_publish') !== null)
+                                    <input type="hidden" name="is_publish" value="{{ request('is_publish') }}">
+                                    @endif
+                                    @if(request('investor_code'))
+                                    <input type="hidden" name="investor_code" value="{{ request('investor_code') }}">
+                                    @endif
+                                    @if(request('investor_name'))
+                                        <input type="hidden" name="investor_name" value="{{ request('investor_name') }}">
+                                    @endif
+                                    @if(request('selected_investor'))
+                                        <input type="hidden" name="selected_investor" value="{{ request('selected_investor') }}">
+                                    @endif
+                                    @if(request('year'))
+                                        <input type="hidden" name="year" value="{{ request('year') }}">
+                                    @endif
+                                    @foreach(request('month', []) as $selectedMonth)
+                                        <input type="hidden" name="month[]" value="{{ $selectedMonth }}">
+                                    @endforeach
                                     <button type="submit" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-capLionGold hover:bg-capLionGold/90">
                                         {{ __('Generate') }}
                                     </button>

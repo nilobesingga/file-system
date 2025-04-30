@@ -11,7 +11,7 @@
             <!-- Content -->
             <div>
                 <h3 class="text-sm font-medium tracking-wider uppercase opacity-80">Net Performance (YTD)</h3>
-                <p class="text-2xl font-bold">{{ $netPerformance }}</p>
+                <p class="text-2xl font-bold">{{ $netPerformance }}%</p>
             </div>
         </div>
     </div>
@@ -28,7 +28,7 @@
             <!-- Content -->
             <div>
                 <h3 class="text-sm font-medium tracking-wider uppercase opacity-80">Last Realized Month’s Net Yield</h3>
-                <p class="text-2xl font-bold">{{ $netYield }}</p>
+                <p class="text-2xl font-bold">{{ $netYield }}%</p>
             </div>
         </div>
     </div>
