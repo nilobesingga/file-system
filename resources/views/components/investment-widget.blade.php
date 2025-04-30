@@ -89,7 +89,7 @@
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
-                            offset: 5,
+                            offset: -2,
                             formatter: (value, context) => {
                                 if (context.dataset.label === "Investor Assets") {
                                     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);

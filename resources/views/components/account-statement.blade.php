@@ -28,17 +28,19 @@
                 <div class="grid grid-cols-[2fr_3fr] gap-x-2">
                     <!-- Labels Column (Aligned Right) -->
                     <div class="text-[10px] text-gray-600 text-right">
-                        <p class="mb-3">Number of Bonds Subscribed:</p>
-                        <p class="mb-3">Total Amount Subscribed (USD):</p>
-                        <p class="mb-3">Bond Name:</p>
-                        <p>Period / Distribution:</p>
+                        <p class="mb-2">Number of Bonds Subscribed:</p>
+                        <p class="mb-2">Total Amount Subscribed (USD):</p>
+                        <p class="mb-2">Bond Name:</p>
+                        <p class="mb-2">Period:</p>
+                        <p>Monthly Distribution:</p>
                     </div>
                     <!-- Values Column (Aligned Left) -->
                     <div class="text-[12px] font-extrabold text-gray-900 text-left">
-                        <p class="mb-2">{{ $statementData['bonds_subscribed'] ?? 'N/A' }}</p>
-                        <p class="mb-2">{{ number_format($statementData['total_amount_subscribed'] ?? 0, 2) }}</p>
-                        <p class="mb-2">{{ $statementData['bond_name'] ?? 'N/A' }}</p>
-                        <p>{{ $statementData['period_distribution'] ?? 'N/A' }}</p>
+                        <p class="mb-1">{{ $statementData['bonds_subscribed'] ?? 'N/A' }}</p>
+                        <p class="mb-1">{{ number_format($statementData['total_amount_subscribed'] ?? 0, 2) }}</p>
+                        <p class="mb-1">{{ $statementData['bond_name'] ?? 'N/A' }}</p>
+                        <p class="mb-1">{{ $statementData['period_distribution'] ?? 'N/A' }}</p>
+                        <p>{{ $statementData['monthly_distribution'] ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>
