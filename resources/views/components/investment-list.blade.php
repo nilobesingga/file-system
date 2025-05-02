@@ -114,37 +114,37 @@
         <table class="min-w-full border border-collapse border-gray-300">
             <thead>
                 <tr>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Code</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Investor Name</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Month / Year</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Beginning Balance</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Capital Gain/Loss</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Fees</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Net Gain/Loss</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Payment Distribution</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Net Percentage</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Number of Bonds</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Ending Balance</th>
-                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Action</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Code</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Investor Name</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Month / Year</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Beginning Balance</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Capital</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Capital Gain/Loss</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Fees</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Net Gain/Loss</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Payment Distribution</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Net Percentage</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Number of Bonds</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Ending Balance</th>
+                    <th class="px-4 py-2 text-[11px] text-left border border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition-colors cursor-pointer group-hover:bg-gray-50/80">Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-200">
                 @forelse ($statistics as $stat)
-                    <tr>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->investor_code }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">{{ $stat->user->name }}</td>
-                        <td class="px-4 py-2 text-[11px] lowercase border border-gray-300 text-nowrap first-letter:capitalize">{{ ucfirst(substr($stat->month, 0, 3)) . " " . $stat->year}}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->investor_assets, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end">{{ number_format($stat->capital, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->capital_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->capital_gain_loss, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] text-red-600 border border-gray-300 text-end">{{ number_format($stat->fees, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->payment_distribution < 0 ? 'text-red-600' : '' }}">{{ number_format($stat->payment_distribution, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_percentage < 0 ? 'text-red-600' : 'text-green-600' }}">{{ number_format($stat->monthly_net_percentage, 2) }}%</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300">{{ $stat->number_of_bonds }}</td>
-                        <td class="px-4 py-2 text-[11px] text-right border border-gray-300">{{ number_format($stat->ending_balance, 2) }}</td>
-                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">
+                    <tr class="even:bg-gray-50 hover:bg-blue-50/50 group/row">
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 group-hover/row:bg-blue-50/30">{{ $stat->investor_code }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap group-hover/row:bg-blue-50/30">{{ $stat->user->name }}</td>
+                        <td class="px-4 py-2 text-[11px] lowercase border border-gray-300 text-nowrap first-letter:capitalize group-hover/row:bg-blue-50/30">{{ ucfirst(substr($stat->month, 0, 3)) . " " . $stat->year}}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end group-hover/row:bg-blue-50/30">{{ number_format($stat->investor_assets, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end group-hover/row:bg-blue-50/30">{{ number_format($stat->capital, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->capital_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }} group-hover/row:bg-blue-50/30">{{ number_format($stat->capital_gain_loss, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] text-red-600 border border-gray-300 text-end group-hover/row:bg-blue-50/30">{{ number_format($stat->fees, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_gain_loss < 0 ? 'text-red-600' : 'text-green-600' }} group-hover/row:bg-blue-50/30">{{ number_format($stat->monthly_net_gain_loss, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->payment_distribution < 0 ? 'text-red-600' : '' }} group-hover/row:bg-blue-50/30">{{ number_format($stat->payment_distribution, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-end {{ $stat->monthly_net_percentage < 0 ? 'text-red-600' : 'text-green-600' }} group-hover/row:bg-blue-50/30">{{ number_format($stat->monthly_net_percentage, 2) }}%</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 group-hover/row:bg-blue-50/30">{{ $stat->number_of_bonds }}</td>
+                        <td class="px-4 py-2 text-[11px] text-right border border-gray-300 group-hover/row:bg-blue-50/30">{{ number_format($stat->ending_balance, 2) }}</td>
+                        <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap group-hover/row:bg-blue-50/30">
 
                             <button type="button" onclick="openDetailModal({{ $stat->id }})" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md transition-all duration-200 bg-blue-600 hover:bg-blue-700">
                                 Details
@@ -198,11 +198,11 @@
                                         {{ __($stat->is_publish ? 'Unpublish' : 'Publish') }}
                                     </button>
                                 </form>
-                                <a href="{{ route('statements.show',$stat->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customBlue hover:bg-customBlue/90' }}">
-                                    {{ 'Preview' }}
-                                </a>
                                 <a href="{{ route('statements.pdf',$stat->id) }}" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customGreen hover:bg-customBlue/90' }}">
                                     {{ 'Download' }}
+                                </a>
+                                <a href="{{ route('statements.show',$stat->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md  transition-all duration-200 bg-customBlue hover:bg-customBlue/90' }}">
+                                    {{ 'Preview' }}
                                 </a>
                                 <form action="{{ route('admin.investments.send-notification', $stat->user_id) }}" method="POST" class="inline">
                                     @csrf
@@ -259,6 +259,12 @@
                                     </button>
                                 </form>
                             @endif
+                            @if (!$stat->is_publish)
+                                <button type="button" onclick="confirmDelete({{ $stat->id }})"
+                                    class="inline-flex items-center px-3 py-1.5 text-[11px] text-white rounded-md transition-all duration-200 bg-yellow-400 hover:bg-red-600">
+                                    {{ __('Delete') }}
+                                </button>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -299,6 +305,7 @@
     </div>
 </div>
 <!-- JavaScript for Modal -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function openDetailModal(statId) {
         // Fetch transaction details via AJAX
@@ -320,6 +327,7 @@
                                 <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Transaction</th>
                                 <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Month</th>
                                 <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Year</th>
+                                <th class="px-4 py-2 text-[11px] text-left border border-gray-300">Explanation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -335,6 +343,7 @@
                                     <td class="px-4 py-2 text-[11px] border border-gray-300 text-nowrap">${transaction.transaction}</td>
                                     <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.month}</td>
                                     <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.year}</td>
+                                    <td class="px-4 py-2 text-[11px] border border-gray-300">${transaction.explanation}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -349,4 +358,92 @@
         document.getElementById('detail-modal').classList.add('hidden');
         document.getElementById('modal-content').innerHTML = '';
     }
+
+    function confirmDelete(statId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-lg',
+                title: 'text-lg font-semibold text-gray-900',
+                htmlContainer: 'text-gray-600',
+                confirmButton: 'px-4 py-2 text-sm font-medium text-white rounded-md',
+                cancelButton: 'px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading state
+                Swal.fire({
+                    title: 'Deleting...',
+                    html: 'Please wait...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Create and submit form with fetch
+                const form = new FormData();
+                form.append('_token', '{{ csrf_token() }}');
+                form.append('_method', 'DELETE');
+                form.append('id', statId);
+
+                fetch('{{ route('admin.investments.delete') }}', {
+                    method: 'POST',
+                    body: form
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: data.message || 'Record has been deleted successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#3B82F6'
+                        }).then(() => {
+                            // Reload the page or update the UI
+                            window.location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to delete record');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: error.message || 'Something went wrong while deleting the record.',
+                        icon: 'error',
+                        confirmButtonColor: '#EF4444'
+                    });
+                });
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.querySelector('table');
+
+        // Add column highlighting
+        table.querySelectorAll('th').forEach((th, index) => {
+            th.addEventListener('mouseover', () => {
+                table.querySelectorAll(`tr > *:nth-child(${index + 1})`).forEach(cell => {
+                    cell.classList.add('bg-blue-50/50');
+                });
+            });
+
+            th.addEventListener('mouseout', () => {
+                table.querySelectorAll(`tr > *:nth-child(${index + 1})`).forEach(cell => {
+                    cell.classList.remove('bg-blue-50/50');
+                });
+            });
+        });
+    });
 </script>
