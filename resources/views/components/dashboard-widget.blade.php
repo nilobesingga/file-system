@@ -10,7 +10,7 @@
             </div>
             <!-- Content -->
             <div>
-                <h3 class="text-sm font-medium tracking-wider uppercase opacity-80">NET PERFORMANCE OF INVESTED CAPITAL (YTD</h3>
+                <h3 class="text-sm font-medium tracking-wider uppercase opacity-80">NET PERFORMANCE OF INVESTED CAPITAL (YTD)</h3>
                 <p class="text-2xl font-bold">{{ $netPerformance }}%</p>
             </div>
         </div>
