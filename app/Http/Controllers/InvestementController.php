@@ -660,4 +660,64 @@ class InvestementController extends Controller
         ]);
         return redirect()->route('admin.investment-list',$filterParams)->with('success', 'Email notification sent to investor email successfully');
     }
+
+    //make a function to delete the investment
+    public function distroy(Request $request)
+    {
+        // return redirect()->back()->with('success', 'Investment deleted successfully.');
+
+        DB::beginTransaction();
+        $filterParams = $request->only([
+            'investor_code',
+            'investor_name',
+            'selected_investor',
+            'year',
+            'month',
+            'is_publish'
+        ]);
+
+        try {
+            $id = $request->input('id');
+            if (!$id) {
+                response()->json(['success' => false , 'message' => 'Investment ID is required.']);
+            }
+            $investment = InvestmentStatistic::findOrFail($id);
+            if ($investment->is_publish == 1) {
+
+                return response()->json(['success' => false , 'message' => 'Investment record is published and cannot be deleted.']);
+            }
+            $months = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
+            $targetMonth = $investment->month;
+            $targetIndex = array_search($targetMonth, $months);
+
+            $monthsToCheck = array_slice($months, $targetIndex + 1); // Months after the target month
+            $investmentExists = InvestmentStatistic::where('investor_code', $investment->investor_code)
+                ->where('year', $investment->year)
+                ->whereIn('month', $monthsToCheck)
+                ->exists();
+            if ($investmentExists) {
+                return response()->json(['success' => false , 'message' => 'Investment record cannot be deleted because there are records after the ' . $investment->month .'.'], 400);
+            }
+
+            StatementSeries::where('statement_id', $id)->delete();
+            $files = Files::where('statement_id', $id)->first();
+            if ($files) {
+                Files::where('statement_id', $id)->where('id',$files->id)->delete();
+                FileUser::where('file_id', $files->id)->delete();
+            }
+
+            Investment::where('investor_code', $investment->investor_code)
+                ->where('month', $investment->month)
+                ->where('year', $investment->year)
+                ->delete();
+
+            $investment->delete();
+
+            DB::commit();
+            return response()->json(['success' => true , 'message' => 'Investment deleted successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error deleting investment: ' . $e->getMessage()], 500);
+        }
+    }
 }
