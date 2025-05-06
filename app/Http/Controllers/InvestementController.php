@@ -388,7 +388,7 @@ class InvestementController extends Controller
         // Fetch statement data (replace with your actual data retrieval logic)
         $statement = InvestmentStatistic::with(['user'])->findOrFail($id);
         $ref = StatementSeries::where('statement_id', $id)->first();
-        $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction')
+        $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction','explanation')
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
                         ->where('year', $statement->year)
@@ -396,7 +396,7 @@ class InvestementController extends Controller
                             Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
                             Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
                         ])
-                        ->groupBy('date', 'transaction_type','transaction','amount')
+                        ->groupBy('date', 'transaction_type','transaction','amount','explanation')
                         ->get();
 
         $distribution = Investment::where('investor_code', $statement->investor_code)
@@ -454,7 +454,7 @@ class InvestementController extends Controller
             'statement_period' => $statement_period ?? '',
             'transactions' => $transact ?? [],
             'gross_capital_gain' => $statement->capital_gain_loss ?? 0.00,
-            'net_amount' => $statement->ending_balance ?? 0.00,
+            'net_amount' => $statement->ending_balance ?? 0.00
         ];
         return view('admin.statements', compact('statementData'));
     }
@@ -463,7 +463,7 @@ class InvestementController extends Controller
     {
         $statement = InvestmentStatistic::with(['user'])->findOrFail($id);
         $ref = StatementSeries::where('statement_id', $id)->first();
-        $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction')
+        $transactions = Investment::select('date', 'transaction_type', DB::raw('SUM(amount) as amount'),'transaction','explanation')
                         ->where('investor_code', $statement->investor_code)
                         ->where('month', $statement->month)
                         ->where('year', $statement->year)
@@ -471,7 +471,7 @@ class InvestementController extends Controller
                             Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
                             Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
                         ])
-                        ->groupBy('date', 'transaction_type','transaction','amount')
+                        ->groupBy('date', 'transaction_type','transaction','amount','explanation')
                         ->get();
         $firstDay = date('d M Y',strtotime("01" . " ".$statement->month ." ". $statement->year));
         $transact['opening'][] = array(

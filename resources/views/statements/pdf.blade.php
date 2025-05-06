@@ -320,6 +320,7 @@
                         <th>Description</th>
                         <th style="width: 120px;">Transaction (USD)</th>
                         <th style="width: 120px;">Balance (USD)</th>
+                        <th style="width: 120px;">Explanation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -350,6 +351,11 @@
                                             {{ number_format($transaction['balance'], 2) }}
                                         @else
                                             -
+                                        @endif
+                                    </td>
+                                    <td style="height: 15px !important; text-align: left !important;">
+                                        @if (isset($transaction['explanation']) && $transaction['explanation'] != '')
+                                            {{ $transaction['explanation'] }}
                                         @endif
                                     </td>
                                 </tr>
