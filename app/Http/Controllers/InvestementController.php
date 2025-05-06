@@ -398,6 +398,16 @@ class InvestementController extends Controller
                         ])
                         ->groupBy('date', 'transaction_type','transaction','amount')
                         ->get();
+
+        $distribution = Investment::where('investor_code', $statement->investor_code)
+                        ->where('month', $statement->month)
+                        ->where('year', $statement->year)
+                        ->whereNotIn('transaction_type', [
+                            Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                            Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                        ])
+                        ->orderBy('date', 'desc')
+                        ->first();
         $firstDay =  date('d M Y',strtotime("01" . " " .$statement->month ." ". $statement->year));
         $transact['opening'][] = array(
             'date' => $firstDay,
@@ -440,7 +450,7 @@ class InvestementController extends Controller
             'total_amount_subscribed' => $statement->capital ?? 0.00,
             'bond_name' => $ref->bond_name ?? '',
             'period_distribution' => $statement->month ." ". $statement->year ?? '',
-            'monthly_distribution' => ($statement->payment_distribution != 0) ? 'Yes' :  'No',
+            'monthly_distribution' => ($distribution->monthly_distribution != 0) ? 'Yes' :  'No',
             'statement_period' => $statement_period ?? '',
             'transactions' => $transact ?? [],
             'gross_capital_gain' => $statement->capital_gain_loss ?? 0.00,
@@ -471,6 +481,16 @@ class InvestementController extends Controller
             'balance' => $statement->investor_assets ?? 0.00,
             'opening' => true
         );
+        $distribution = Investment::where('investor_code', $statement->investor_code)
+                        ->where('month', $statement->month)
+                        ->where('year', $statement->year)
+                        ->whereNotIn('transaction_type', [
+                            Investment::TRANSACTION_TYPE_COMPOUND_DISTRIBUTION,
+                            Investment::TRANSACTION_TYPE_MONTHLY_DISTRIBUTION
+                        ])
+                        ->orderBy('date', 'desc')
+                        ->first();
+
         $balance = $statement->investor_assets ?? 0;
         foreach ($transactions as $trans) {
             $xdata = $trans->toArray();
@@ -508,7 +528,7 @@ class InvestementController extends Controller
             'total_amount_subscribed' => $statement->capital ?? 0.00,
             'bond_name' => $ref->bond_name ?? '',
             'period_distribution' => $statement->month ." ". $statement->year ?? '',
-            'monthly_distribution' => ($statement->payment_distribution != 0) ? 'Yes' :  'No',
+            'monthly_distribution' => ($distribution->monthly_distribution != 0) ? 'Yes' :  'No',
             'statement_period' => $statement_period ?? '',
             'transactions' => $transact ?? [],
             'gross_capital_gain' => $statement->capital_gain_loss ?? 0.00,
