@@ -57,7 +57,6 @@
         .customer-section {
             display: block;
             justify-content: space-between;
-            margin-bottom: 15px;
         }
         .customer-info {
             width: 43%;
@@ -66,7 +65,7 @@
             position: absolute;
             right: 0;
             left: 42%;
-            top: 110px;
+            top: 118px;
             width: 55%;
             padding: 10px;
             border: 1px solid #003087;
@@ -303,7 +302,7 @@
                 </div>
             </div>
         </div>
-
+        <br/>
         <div class="divider"></div>
 
         <!-- Account Summary -->
@@ -320,6 +319,7 @@
                         <th>Description</th>
                         <th style="width: 120px;">Transaction (USD)</th>
                         <th style="width: 120px;">Balance (USD)</th>
+                        <th style="width: 120px;">Explanation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -350,6 +350,11 @@
                                             {{ number_format($transaction['balance'], 2) }}
                                         @else
                                             -
+                                        @endif
+                                    </td>
+                                    <td style="height: 15px !important; text-align: left !important;">
+                                        @if (isset($transaction['explanation']) && $transaction['explanation'] != '')
+                                            {{ $transaction['explanation'] }}
                                         @endif
                                     </td>
                                 </tr>

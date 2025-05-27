@@ -63,6 +63,7 @@
                             <th class="px-3 h-[3rem] py-1 w-40 text-sm font-semibold text-left border-b-4 border-capLionGold">Description</th>
                             <th class="w-32 px-3 h-[3rem] py-1 text-sm font-semibold text-right border-b-4 border-capLionGold text-nowrap">Transaction (USD)</th>
                             <th class="w-32 px-3 h-[3rem] py-1 text-sm font-semibold text-right border-b-4 border-capLionGold">Balance (USD)</th>
+                            <th class="w-32 px-3 h-[3rem] py-1 text-sm font-semibold text-left border-b-4 border-capLionGold">Explanation</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,11 +96,16 @@
                                             -
                                         @endif
                                     </td>
+                                    <td class="px-2 py-1 text-[10px] text-left font-semibold h-[1rem] align-top">
+                                        @if (isset($transaction['explanation']) && $transaction['explanation'] != '')
+                                            {{ $transaction['explanation'] ?? '' }}
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         @empty
                             <tr>
-                                <td colspan="5" class="px-2 py-1 text-center text-gray-500 border border-gray-300">No transactions found.</td>
+                                <td colspan="6" class="px-2 py-1 text-center text-gray-500 border border-gray-300">No transactions found.</td>
                             </tr>
                         @endforelse
                     </tbody>
