@@ -32,7 +32,6 @@ class DashboardController extends Controller
         $users = User::where('is_admin', 0)->get();
         // Ensure the user has the correct relationship
         $categoryIds = CategoryUser::select('category_id')->where('user_id',$user->id)->pluck('category_id')->toArray(); // FIXED: Use correct relationship
-
         // Get sort parameters from the request (default to sorting by unread status)
         $sortBy = request('sort', 'unread');
         $sortDirection = request('direction', 'desc');
@@ -40,15 +39,15 @@ class DashboardController extends Controller
         // Build query for fetching files
         $filesQuery = Files::with('user', 'category')->where('is_delete',0)->whereIn('category_id', $categoryIds)->where('files.user_id',$user->id)
                         ->leftJoin('investment_statistics', function ($join){
-                            $join->on('investment_statistics.id', '=', 'files.statement_id');
+                            $join->on('investment_statistics.id', '=', 'files.statement_id')
+                            ->on('investment_statistics.user_id', '=', 'files.user_id');
                         })
                         ->whereIN('investment_statistics.is_publish', $is_publish);
 
         // Sorting logic
         if ($sortBy === 'unread') {
             $filesQuery->leftJoin('file_user', function ($join) use ($user) {
-                $join->on('files.id', '=', 'file_user.file_id')
-                     ->where('file_user.user_id', $user->id);
+                $join->on('files.id', '=', 'file_user.file_id');
             })
             ->select('files.*')
             ->orderByRaw("file_user.read_at IS NULL $sortDirection");
@@ -93,11 +92,21 @@ class DashboardController extends Controller
 
         // Count new files uploaded today
         // $newFiles = ($totalFiles > 0) ? \App\Helpers\FileHelper::getNotication() : 0;
-        $unreadFilesCount = Files::where('is_delete', 0)
-            ->where('user_id', $user->id)
+        // $unreadFilesCount = Files::where('is_delete', 0)
+        //     ->where('user_id', $user->id)
+        //     ->whereDoesntHave('readers', function ($query) use($user) {
+        //     $query->where('user_id', $user->id);
+        // });
+        // $newFiles = $unreadFilesCount->count();
+        $unreadFilesCount = Files::where('files.is_delete', 0)
+            ->where('files.user_id', $user->id)
+            ->leftJoin('investment_statistics', function ($join) {
+                $join->on('investment_statistics.id', '=', 'files.statement_id');
+            })
+            ->whereIn('investment_statistics.is_publish', $is_publish)
             ->whereDoesntHave('readers', function ($query) use($user) {
-            $query->where('user_id', $user->id);
-        });
+                $query->where('user_id', $user->id);
+            });
         $newFiles = $unreadFilesCount->count();
 
         // Get all categories
