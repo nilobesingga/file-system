@@ -543,6 +543,7 @@ class InvestementController extends Controller
         $pdf = Pdf::loadView('statements.pdf', compact('statementData','logo'))
             ->setPaper('a4', 'portrait')
             ->setOptions([
+                'isPhpEnabled' => true,
                 'isHtml5ParserEnabled' => true,
                 'isRemoteEnabled' => true,
                 'defaultFont' => 'helvetica',
@@ -559,6 +560,8 @@ class InvestementController extends Controller
         }
         // For download instead of preview:
         return $pdf->download('account-statement-' . $id . '.pdf');
+        // For preview in browser:
+        // return $pdf->stream('account-statement-' . $id . '.pdf');
     }
 
     public function details($id)
