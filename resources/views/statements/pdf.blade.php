@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Statement</title>
     <style>
+        @page {
+            margin-bottom: 20px;
+        }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             margin: 0;
@@ -15,6 +18,13 @@
         }
         .statement-container {
             position: relative;
+            padding-bottom: 150px;
+            min-height: 900px;
+            /* Add forced page break after if content exceeds min-height */
+        }
+        /* Add a utility class for page break */
+        .page-break {
+            page-break-after: always;
         }
         .header {
             display: flex;
@@ -138,6 +148,7 @@
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 10px;
+            page-break-inside: auto;
         }
         .transactions-table th {
             background-color: #091935;
@@ -166,18 +177,22 @@
         .transactions-table tr:nth-child(even) {
             /* background-color: #F3F4F6; */
         }
+        .transactions-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
         .performance-box {
             width: 300px;
             padding: 10px;
             border: 1px solid #111827;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .performance-title {
             font-size: 12px;
             font-weight: 600;
             color: #111827;
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         .performance-flex {
             display: flex;
@@ -207,15 +222,17 @@
             font-size: 10px;
             font-style: italic;
             color: #4B5563;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             margin-top: 0;
         }
         .footer-container {
-            position: absolute;
-            bottom: 0;
+            position: fixed;
+            bottom: -10px;
             width: 100%;
+            page-break-inside: avoid;
         }
         .footer {
+            position : relative;
             display: flex;
             justify-content: space-between;
             font-size: 9px;
@@ -237,8 +254,10 @@
             color: #1F2937;
         }
         .footer-right p {
-            margin: 0;
-            margin-bottom: 2px;
+            text-align: right !important;
+            margin-top: -40px;
+            margin-right: 0;
+            margin-bottom: -20px;
         }
         .bg-capLionBlue {
             background-color: #091935 !important;
@@ -361,43 +380,43 @@
                             @endforeach
                         @empty
                             <tr>
-                                <td colspan="5" class="px-2 py-1 text-center text-gray-500 border border-gray-300">No transactions found.</td>
+                                <td colspan="6" class="px-2 py-1 text-center text-gray-500 border border-gray-300">No transactions found.</td>
                             </tr>
                         @endforelse
                 </tbody>
             </table>
         </div>
         <div class="footer-container">
-        <!-- Performance Summary -->
-        <div class="performance-box">
-            <h3 class="performance-title">Performance Summary</h3>
-            <div class="performance-flex">
-                <div>
-                    <p class="performance-label">
-                        Gross Capital Gain
-                        <span class="performance-value">{{ number_format($statementData['gross_capital_gain'], 2) }}</span>
-                    </p>
-                </div>
-                <div>
-                    <p class="performance-label" style="text-align: right; margin-right: 20px; margin-top: -32px; margin-bottom: 5px;">
-                        Net Amount after fees
-                        <span class="performance-value" style="margin-left: -40px !important;">{{ number_format($statementData['net_amount'], 2) }} &nbsp; &nbsp;&nbsp; &nbsp;</span>
-                    </p>
+            <!-- Performance Summary -->
+            <div class="performance-box">
+                <h3 class="performance-title">Performance Summary</h3>
+                <div class="performance-flex">
+                    <div>
+                        <p class="performance-label">
+                            Gross Capital Gain
+                            <span class="performance-value">{{ number_format($statementData['gross_capital_gain'], 2) }}</span>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="performance-label" style="text-align: right; margin-right: 20px; margin-top: -32px; margin-bottom: 5px;">
+                            Net Amount after fees
+                            <span class="performance-value" style="margin-left: -40px !important;">{{ number_format($statementData['net_amount'], 2) }} &nbsp; &nbsp;&nbsp; &nbsp;</span>
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Disclaimer & Legal Notice -->
-        <div>
-            <h4 class="disclaimer-title">Disclaimer & Legal Notice:</h4>
-            <p class="disclaimer-text">
-                The information contained in this statement is provided for informational purposes only
-                and does not constitute an offer to sell or a solicitation to buy any securities. Past
-                performance is not indicative of future results. All investments carry risks, and you should
-                review your statement carefully and consult with your financial advisor if needed.
-            </p>
-        </div>
+            <!-- Disclaimer & Legal Notice -->
+            <div>
+                <h4 class="disclaimer-title">Disclaimer & Legal Notice:</h4>
+                <p class="disclaimer-text">
+                    The information contained in this statement is provided for informational purposes only
+                    and does not constitute an offer to sell or a solicitation to buy any securities. Past
+                    performance is not indicative of future results. All investments carry risks, and you should
+                    review your statement carefully and consult with your financial advisor if needed.
+                </p>
+            </div>
 
-        <!-- Footer -->
+            <!-- Footer -->
             <div class="divider"></div>
             <div class="footer">
                 <div>
@@ -406,8 +425,20 @@
                     <p class="footer-address">info@caplionpoint.com | +248 430 3187</p>
                 </div>
                 <div class="footer-right">
-                    <p>ACCOUNT STATEMENT | {{ date('d M Y', strtotime($statementData['date'])) }} - {{ now()->format('H:i') }}</p>
-                    <p>Page 1 of 1</p>
+                    <p>
+                        ACCOUNT STATEMENT | {{ date('d M Y', strtotime($statementData['date'])) }} - {{ now()->format('H:i') }}
+                        <script type="text/php">
+                            if (isset($pdf)) {
+                                $pdf->page_script('
+                                    $font = $fontMetrics->get_font("Helvetica", "normal");
+                                    $size = 7;
+                                    $text = "Page " . $PAGE_NUM . " of " . $PAGE_COUNT;
+                                    $pdf->text(520, 820, $text, $font, $size);
+                                ');
+                            }
+                        </script>
+                    </p>
+
                 </div>
             </div>
         </div>
