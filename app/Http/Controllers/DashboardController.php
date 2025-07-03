@@ -37,20 +37,23 @@ class DashboardController extends Controller
         $sortDirection = request('direction', 'desc');
 
         // Build query for fetching files
-        $filesQuery = Files::with('user', 'category')->where('is_delete',0)->whereIn('category_id', $categoryIds)->where('files.user_id',$user->id)
-                        ->leftJoin('investment_statistics', function ($join){
-                            $join->on('investment_statistics.id', '=', 'files.statement_id')
-                            ->on('investment_statistics.user_id', '=', 'files.user_id');
-                        })
-                        ->whereIN('investment_statistics.is_publish', $is_publish);
+        $filesQuery = Files::with('user', 'category')
+            ->where('is_delete', 0)
+            ->whereIn('category_id', $categoryIds)
+            ->where('files.user_id', $user->id)
+            ->leftJoin('investment_statistics', function ($join) {
+                $join->on('investment_statistics.id', '=', 'files.statement_id')
+                    ->on('investment_statistics.user_id', '=', 'files.user_id');
+            })
+            ->whereIn('investment_statistics.is_publish', $is_publish);
 
-        // Sorting logic
         if ($sortBy === 'unread') {
             $filesQuery->leftJoin('file_user', function ($join) use ($user) {
-                $join->on('files.id', '=', 'file_user.file_id');
-            })
-            ->select('files.*')
-            ->orderByRaw("file_user.read_at IS NULL $sortDirection");
+                    $join->on('files.id', '=', 'file_user.file_id');
+                })
+                ->select('files.*', DB::raw('MAX(file_user.read_at) as max_read_at'))
+                ->groupBy('files.id')
+                ->orderByRaw('max_read_at IS NULL ' . $sortDirection);
         } else {
             switch ($sortBy) {
                 case 'document_name':
@@ -67,10 +70,12 @@ class DashboardController extends Controller
                 default:
                     $filesQuery->orderBy('created_at', $sortDirection);
             }
+            $filesQuery->select('files.*'); // Ensure only files columns are selected
         }
 
         // Paginate results
         $files = $filesQuery->paginate(15);
+        // dd($files);
         $totalFiles = Files::whereIn('files.category_id', $categoryIds)
                         ->leftJoin('investment_statistics', function ($join){
                             $join->on('investment_statistics.id', '=', 'files.statement_id');
