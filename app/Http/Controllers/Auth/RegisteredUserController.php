@@ -48,6 +48,7 @@ class RegisteredUserController extends Controller
         if ($request->has('category_id')) {
             $user->categories()->attach($request->category_id);
         }
+        $user->notify(new \App\Notifications\NewUserAccountNotification($user,$request->password));
 
         event(new Registered($user));
 
@@ -87,6 +88,7 @@ class RegisteredUserController extends Controller
         if ($request->has('category_ids')) {
             $user->categories()->sync($request->category_ids);
         }
+        $user->notify(new \App\Notifications\NewUserAccountNotification($user, $request->password));
 
         return redirect()->route('admin.users')->with('success', 'User updated successfully');
     }
